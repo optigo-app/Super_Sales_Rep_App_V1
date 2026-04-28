@@ -1,0 +1,53 @@
+@use 'variables' as *;
+
+// ── Font Size Utilities ───────────────────────────────
+.text-xs   { font-size: $font-xs;   }
+.text-sm   { font-size: $font-sm;   }
+.text-base { font-size: $font-base; }
+.text-md   { font-size: $font-md;   }
+.text-lg   { font-size: $font-lg;   }
+.text-xl   { font-size: $font-xl;   }
+.text-2xl  { font-size: $font-2xl;  }
+.text-3xl  { font-size: $font-3xl;  }
+
+// ── Color Utilities ───────────────────────────────────
+.text-primary-color   { color: $text-primary;   }
+.text-secondary-color { color: $text-secondary; }
+.text-muted-color     { color: $text-muted;     }
+.text-purple          { color: $primary;        }
+.text-success         { color: $success;        }
+.text-warning         { color: $warning;        }
+.text-danger          { color: $danger;         }
+.text-white           { color: $white;          }
+
+// ── Weight ────────────────────────────────────────────
+.font-medium   { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold     { font-weight: 700; }
+
+// ── Section Titles ────────────────────────────────────
+.section-title {
+  font-size: $font-lg;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: 12px;
+}
+
+.page-title {
+  font-size: $font-2xl;
+  font-weight: 800;
+  color: $text-primary;
+  letter-spacing: -0.3px;
+}
+
+.card-label {
+  font-size: $font-sm;
+  color: $text-secondary;
+  margin-bottom: 2px;
+}
+
+.card-value {
+  font-size: $font-2xl;
+  font-weight: 700;
+  color: $text-primary;
+}

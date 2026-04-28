@@ -1,0 +1,428 @@
+@import "../../Sass/variable.scss";
+
+.scanner-container {
+  max-width: 500px;
+  margin: auto;
+  margin: 10px;
+
+  .ProductScanTitle {
+    font-size: 20px;
+    margin: 0px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .ProductScanTitleRecent {
+    font-size: 20px;
+    margin: 0px;
+    font-weight: 600;
+  }
+
+  .qr-scanner-box {
+    border: 2px dashed #aaa;
+    border-radius: 8px;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #fff;
+  }
+
+  .bottom-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    z-index: 10;
+
+    button {
+      flex: 1;
+      padding: 1rem;
+      font-size: 1rem;
+      border: none;
+      background: #f0f0f0;
+      color: #333;
+
+      &.active {
+        background: #00a2e1;
+        color: #fff;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .camera-45 {
+    height: 45vh;
+  }
+
+  .scanner-wrapper {
+    width: 95vw;
+    // background: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    --blur: 8px; /* strength of frosted-glass */
+  }
+}
+
+.camera-container {
+  width: 100%;
+  position: relative;
+  height: 40vh;
+}
+
+.camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.discount-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+
+  .modal-content {
+    background: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+
+    .toggle-buttons {
+      display: flex;
+      justify-content: center;
+      margin: 1rem 0;
+
+      button {
+        margin: 0 5px;
+        padding: 5px 10px;
+        &.active {
+          background-color: #1976d2;
+          color: white;
+        }
+      }
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 10px 0;
+    }
+
+    .price-summary {
+      margin: 1rem 0;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      button {
+        flex: 1;
+        margin: 0 5px;
+      }
+    }
+  }
+}
+
+// /* Hide on screen */
+// #printSection {
+//   display: none;
+// }
+
+// /* Show only when printing or rendering to canvas (like html2pdf) */
+// @media print {
+//   #printSection {
+//     display: block !important;
+//   }
+// }
+
+.mobile-drawer-container {
+  position: relative;
+  z-index: 0;
+}
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.drawer-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.drawer-from-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 100%);
+  transition: transform 0.5s ease;
+  z-index: 99999999999999999999 !important;
+  width: 90%;
+  max-width: 400px;
+}
+
+.drawer-from-bottom.open {
+  transform: translate(-50%, -30vh);
+}
+
+.drawer-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(0%);
+}
+
+.open-drawer-btn {
+  padding: 12px 18px;
+  font-size: 16px;
+}
+
+.price_breack_div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.price_breack_div_titles {
+  font-size: 13px;
+  margin: 3px;
+}
+
+.price_breack_div_titles_total {
+  margin: 3px;
+  font-size: 14px;
+  color: black;
+}
+
+.price_breack_div_values {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 3px;
+}
+
+.price_breack_div_values_total {
+  font-size: 15 px;
+  font-weight: 600;
+  margin: 3px;
+}
+
+.SignleCard_Main {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background-color: white;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+
+  .singleCard_priceView {
+    font-size: 20px;
+    color: $heightlightColor;
+    font-weight: 600;
+    margin: 0px;
+  }
+
+  .info_main_section {
+    margin: 0px;
+    font-size: 11px;
+    color: $titleColor;
+  }
+
+  .info_main_section_span {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(24, 23, 23, 0.86);
+  }
+}
+
+.manual-input {
+  display: flex;
+  margin: 15px 5px 15px 5px;
+  gap: 0.5rem;
+
+  input {
+    flex: 1;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    height: 35px;
+    padding: 5px;
+    font-size: 17px;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    background: #00a2e1;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+  }
+}
+
+.JobScannerPage {
+  height: 50px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+
+  .action-buttons {
+    padding: 0 15px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+
+    button {
+      margin-top: 8px;
+      width: 50%;
+      color: $titleColor !important;
+      border: 1px solid #d3d3d3 !important;
+      border-radius: 8px !important;
+      text-transform: none;
+    }
+  }
+
+  .footer-divider {
+    margin: 8px 0;
+  }
+
+  .text-buttons {
+    display: flex;
+    height: 100%;
+
+    .active {
+      background-color: #2196f3 !important;
+      color: white !important;
+      border-radius: 0px !important;
+    }
+
+    button {
+      color: $heightlightColor !important;
+      font-weight: 500;
+      width: 33%;
+      text-transform: none;
+    }
+  }
+}
+
+.expand_container_All_job {
+  padding-bottom: 200px;
+  margin: 10px 5px 5px 5px;
+
+  .recent-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+
+    .left {
+      strong {
+        font-size: 1rem;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    }
+
+    .status {
+      background: #d4edda;
+      color: #155724;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+  }
+
+  .expand_container_All_job_sub {
+    transition: all 0.3s ease-in-out;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    width: 100%;
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .expand-wrapper {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 1s ease, opacity 1s ease;
+    }
+
+    .expand-wrapper.expanded {
+      max-height: 1000px;
+      opacity: 1;
+    }
+
+    .singleCard_priceView {
+      font-size: 20px;
+      color: $heightlightColor;
+      font-weight: 600;
+      margin: 0px;
+    }
+
+    .desc_metal_line {
+      color: $titleColor;
+      font-size: 13px;
+    }
+
+    .showData_price_title {
+      color: $titleColor;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 5px 0px;
+    }
+
+    .showData_price_deatil {
+      color: $heightlightColor;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 5px 0px;
+    }
+
+    .info_main_section {
+      margin: 0px;
+      font-size: 11px;
+      color: $titleColor;
+    }
+
+    .info_main_section_span {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(24, 23, 23, 0.86);
+    }
+  }
+}

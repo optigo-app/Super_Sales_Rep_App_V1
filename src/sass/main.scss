@@ -1,0 +1,325 @@
+// @use 'variables' as *;
+// @use 'buttons';
+// @use 'typography';
+
+// // ── CSS Custom Properties (consumed by MUI & JS) ────────
+// :root {
+//   --font-primary: #{$font-primary};
+//   --font-heading: #{$font-heading};
+//   --font-accent:  #{$font-accent};
+// }
+
+// // ── Reset ─────────────────────────────────────────────
+// *,
+// *::before,
+// *::after {
+//   box-sizing: border-box;
+//   margin: 0;
+//   padding: 0;
+// }
+
+// html,
+// body,
+// #__next {
+//   height: 100%;
+//   overflow-x: hidden;
+// }
+
+// body {
+//   font-family: $font-primary;
+//   background: $bg-page;
+//   color: $text-primary;
+//   -webkit-font-smoothing: antialiased;
+//   -moz-osx-font-smoothing: grayscale;
+//   font-size: $font-base;
+// }
+
+// // ── Mobile App Wrapper ────────────────────────────────
+// .mobile-app {
+//   max-width: 480px;
+//   min-height: 100vh;
+//   margin: 0 auto;
+//   background: $bg-page;
+//   position: relative;
+//   overflow-x: hidden;
+//   box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+// }
+
+// // ── Scrollable ────────────────────────────────────────
+// .scroll-y {
+//   overflow-y: auto;
+//   -webkit-overflow-scrolling: touch;
+//   scrollbar-width: none;
+
+//   &::-webkit-scrollbar {
+//     display: none;
+//   }
+// }
+
+// // ── Card ──────────────────────────────────────────────
+// .card {
+//   background: $bg-card;
+//   border-radius: $radius-lg;
+//   padding: 16px;
+//   box-shadow: $shadow-sm;
+//   border: 1px solid rgba(124, 58, 237, 0.06);
+// }
+
+// // ── Press Effect ──────────────────────────────────────
+// .press-effect {
+//   transition: transform 0.15s ease;
+//   -webkit-tap-highlight-color: transparent;
+//   cursor: pointer;
+
+//   &:active {
+//     transform: scale(0.97);
+//   }
+// }
+
+// // ── Filter Chips ──────────────────────────────────────
+// .filter-chip {
+//   display: inline-flex;
+//   align-items: center;
+//   padding: 6px 14px;
+//   border-radius: $radius-full;
+//   font-size: $font-sm;
+//   font-weight: 600;
+//   cursor: pointer;
+//   border: 1.5px solid $border-color;
+//   background: $white;
+//   color: $text-secondary;
+//   transition: all 0.15s ease;
+//   -webkit-tap-highlight-color: transparent;
+//   white-space: nowrap;
+
+//   &:active {
+//     transform: scale(0.95);
+//   }
+
+//   &.active {
+//     background: $primary;
+//     color: $white;
+//     border-color: $primary;
+//   }
+// }
+
+// // ── Search Bar ────────────────────────────────────────
+// .search-bar {
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+//   background: $white;
+//   border-radius: $radius-full;
+//   padding: 10px 16px;
+//   box-shadow: $shadow-sm;
+//   border: 1px solid rgba(124, 58, 237, 0.1);
+
+//   input {
+//     flex: 1;
+//     border: none;
+//     outline: none;
+//     font-size: $font-base;
+//     color: $text-primary;
+//     background: transparent;
+
+//     &::placeholder {
+//       color: $text-muted;
+//     }
+//   }
+
+//   svg {
+//     color: $text-muted;
+//     flex-shrink: 0;
+//   }
+// }
+
+// // ── Status Badges ─────────────────────────────────────
+// %badge-base {
+//   display: inline-flex;
+//   align-items: center;
+//   padding: 2px 10px;
+//   border-radius: $radius-full;
+//   font-size: $font-xs;
+//   font-weight: 600;
+// }
+
+// .badge-new,
+// .badge-active,
+// .badge-completed,
+// .badge-delivered {
+//   @extend %badge-base;
+//   background: rgba(16, 185, 129, 0.12);
+//   color: #059669;
+// }
+
+// .badge-inactive {
+//   @extend %badge-base;
+//   background: rgba(156, 163, 175, 0.18);
+//   color: $text-secondary;
+// }
+
+// .badge-processing,
+// .badge-pending {
+//   @extend %badge-base;
+//   background: rgba(249, 115, 22, 0.12);
+//   color: $warning;
+// }
+
+// .badge-out {
+//   @extend %badge-base;
+//   background: $danger;
+//   color: $white;
+// }
+
+// // ── MUI Font Override ─────────────────────────────────
+// // All MUI components inherit $font-primary from SCSS.
+// // Change $font-primary in _variables.scss → updates here automatically.
+// [class*="Mui"] {
+//   font-family: $font-primary !important;
+// }
+
+// // ── Heading Font Helpers ──────────────────────────────
+// // Add .font-heading or .font-accent to any element to
+// // switch it to $font-heading / $font-accent instantly.
+// .font-heading { font-family: $font-heading; }
+// .font-accent  { font-family: $font-accent;  }
+
+// // ── Section Header ────────────────────────────────────
+// .section-header {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   margin-bottom: 12px;
+// }
+
+// .see-all-btn {
+//   font-size: 13px;
+//   font-weight: 600;
+//   color: $primary;
+//   background: $primary-light;
+//   padding: 4px 12px;
+//   border-radius: $radius-full;
+//   cursor: pointer;
+//   -webkit-tap-highlight-color: transparent;
+//   transition: all 0.15s ease;
+
+//   &:active {
+//     transform: scale(0.95);
+//     background: darken($primary-light, 6%);
+//   }
+// }
+
+// // ── Avatar ────────────────────────────────────────────
+// .avatar-circle {
+//   width: 44px;
+//   height: 44px;
+//   border-radius: $radius-full;
+//   background: $primary;
+//   color: $white;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   font-size: $font-lg;
+//   font-weight: 700;
+//   flex-shrink: 0;
+// }
+
+// // ── Divider ───────────────────────────────────────────
+// .divider {
+//   height: 1px;
+//   background: rgba(124, 58, 237, 0.08);
+//   margin: 12px 0;
+// }
+
+// // ── Tab Underline ─────────────────────────────────────
+// .tab-underline {
+//   display: flex;
+//   border-bottom: 2px solid rgba(124, 58, 237, 0.1);
+//   margin-bottom: 16px;
+
+//   .tab-item {
+//     flex: 1;
+//     text-align: center;
+//     padding: 10px 0;
+//     font-size: $font-base;
+//     font-weight: 600;
+//     color: $text-secondary;
+//     cursor: pointer;
+//     transition: color 0.15s;
+//     -webkit-tap-highlight-color: transparent;
+//     position: relative;
+
+//     &.active {
+//       color: $primary;
+
+//       &::after {
+//         content: '';
+//         position: absolute;
+//         bottom: -2px;
+//         left: 0;
+//         right: 0;
+//         height: 2px;
+//         background: $primary;
+//         border-radius: 1px;
+//       }
+//     }
+//   }
+// }
+
+// // ── MRP Form ──────────────────────────────────────────
+// .mrp-input {
+//   width: 100%;
+//   padding: 12px 16px;
+//   border-radius: $radius-md;
+//   border: 1.5px solid $border-color;
+//   font-size: $font-base;
+//   color: $text-primary;
+//   background: $white;
+//   outline: none;
+//   transition: border-color 0.15s;
+
+//   &:focus {
+//     border-color: $primary;
+//     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+//   }
+
+//   &::placeholder {
+//     color: $text-muted;
+//   }
+// }
+
+// .mrp-label {
+//   font-size: $font-sm;
+//   font-weight: 600;
+//   color: $text-secondary;
+//   margin-bottom: 6px;
+//   display: block;
+// }
+
+// // ── Product Card ──────────────────────────────────────
+// .product-card {
+//   background: $white;
+//   border-radius: $radius-lg;
+//   overflow: hidden;
+//   box-shadow: $shadow-sm;
+//   border: 1px solid rgba(124, 58, 237, 0.06);
+//   cursor: pointer;
+//   -webkit-tap-highlight-color: transparent;
+//   transition: transform 0.15s ease;
+//   position: relative;
+
+//   &:active {
+//     transform: scale(0.97);
+//   }
+// }
+
+// .product-img-area {
+//   width: 100%;
+//   aspect-ratio: 1;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   position: relative;
+//   border-radius: $radius-md;
+//   overflow: hidden;
+// }

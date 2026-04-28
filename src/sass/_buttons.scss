@@ -1,0 +1,142 @@
+@use 'variables' as *;
+
+// ── Base button reset ─────────────────────────────────
+%btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: $radius-full;
+  cursor: pointer;
+  font-size: $font-base;
+  font-weight: 600;
+  padding: 10px 20px;
+  transition: all 0.18s ease;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// ── Variants ──────────────────────────────────────────
+.btn-primary {
+  @extend %btn-base;
+  background: $primary;
+  color: $white;
+
+  &:active {
+    background: $primary-dark;
+  }
+}
+
+.btn-outline {
+  @extend %btn-base;
+  background: transparent;
+  color: $primary;
+  border: 1.5px solid $primary-light;
+
+  &:active {
+    background: $primary-light;
+  }
+}
+
+.btn-ghost {
+  @extend %btn-base;
+  background: $primary-light;
+  color: $primary;
+
+  &:active {
+    background: darken($primary-light, 6%);
+  }
+}
+
+.btn-success {
+  @extend %btn-base;
+  background: $success;
+  color: $white;
+}
+
+.btn-danger {
+  @extend %btn-base;
+  background: $danger;
+  color: $white;
+}
+
+// ── Sizes ─────────────────────────────────────────────
+.btn-sm {
+  font-size: $font-sm;
+  padding: 6px 12px;
+}
+
+.btn-lg {
+  font-size: $font-lg;
+  padding: 14px 28px;
+}
+
+// ── Icon Button ───────────────────────────────────────
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: $radius-full;
+  background: $primary-light;
+  color: $primary;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s ease;
+
+  &:active {
+    transform: scale(0.88);
+    background: darken($primary-light, 8%);
+  }
+}
+
+.btn-icon-green {
+  @extend .btn-icon;
+  background: rgba(16, 185, 129, 0.12);
+  color: $success;
+
+  &:active {
+    background: rgba(16, 185, 129, 0.22);
+  }
+}
+
+// ── Floating Action Button ────────────────────────────
+.fab {
+  width: 56px;
+  height: 56px;
+  border-radius: $radius-full;
+  background: $primary;
+  color: $white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+  border: none;
+  cursor: pointer;
+  position: fixed;
+  right: calc(50% - 240px + 20px);
+  bottom: 76px;
+  z-index: 100;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.9);
+    box-shadow: 0 2px 10px rgba(124, 58, 237, 0.3);
+  }
+}
+
+.fab-teal {
+  @extend .fab;
+  background: #0D9488;
+  box-shadow: 0 4px 20px rgba(13, 148, 136, 0.4);
+}
