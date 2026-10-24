@@ -2,7 +2,7 @@ import React from "react";
 import "./PritnModel.scss";
 
 const PritnModel = ({ activeDetail }) => {
-  console.log("activeDetail", activeDetail);
+  console.log('activeDetail: ', activeDetail);
   const productPrintInfo = JSON.parse(
     sessionStorage.getItem("productPrintInfo")
   );
@@ -121,7 +121,7 @@ const PritnModel = ({ activeDetail }) => {
                   <p className="deatil_value_p">{dataa?.netWeight}</p>
                 </div>
                 <div>
-                  <p className="deatil_totla_p">{dataa?.TotalNetWtPrice}</p>
+                  <p className="deatil_totla_p">{dataa?.TotalMetalCost}</p>
                 </div>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>

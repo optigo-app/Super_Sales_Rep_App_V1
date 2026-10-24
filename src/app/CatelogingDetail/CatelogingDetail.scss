@@ -1,0 +1,189 @@
+@use "../../sass/_variables" as *;
+
+$mainColor: $primary;
+$boxShadow: $shadow-sm;
+$fontTitleColor: $text-primary;
+
+.cateLogDetail_Main {
+  .Catelog_OrderCount {
+    height: 50px;
+    background-color: $mainColor;
+    margin: 0px;
+    text-align: center;
+    font-weight: 600;
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 15px;
+    padding-inline: 10px;
+  }
+
+  .cateloging_sub_div {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .catelogin_sub_deatil_div {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .Filter_icone_catelog {
+    color: $mainColor !important;
+    font-size: 25px;
+    margin-right: 10px;
+  }
+
+  .cat_deatil_title {
+    margin: 2px;
+    font-size: 11px;
+  }
+
+  .cat_dezatil_value {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .all_catelog_detail_view {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+  }
+  .catelog_deatil_div {
+    padding: 12px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(124, 58, 237, 0.1);
+    background-color: white;
+    border: 1px solid #EDE9FE;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    &:active {
+      transform: scale(0.98);
+      box-shadow: 0 1px 6px rgba(124, 58, 237, 0.15);
+    }
+  }
+
+  .catelog_Title_name {
+    font-size: 16px;
+    margin: 0px;
+    font-weight: 600;
+    color: $fontTitleColor;
+  }
+
+  .catelog_deatil_image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+  }
+
+  .catelog_Image_main_div {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .search_bar_cateloging {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    left: 0;
+    right: 0;
+    bottom: -500px; /* Hidden by default */
+    background: white;
+    padding: 20px;
+    border-top: 2px solid #ccc;
+    transition: bottom 0.5s ease-in-out; /* Transition animation */
+    z-index: 100;
+
+    &.open {
+      bottom: 0;
+    }
+  }
+
+  .search_box_container_top_div {
+    display: flex;
+    justify-content: space-between;
+  }
+  .filter_text {
+    margin: 0px 0px 5px 15px;
+    font-size: 18px;
+    font-weight: 600;
+    color: $mainColor;
+  }
+
+  .filter_text_clear {
+    margin: 0px 0px 5px 15px;
+    font-size: 18px;
+    font-weight: 600;
+    color: $mainColor;
+    text-decoration: underline;
+  }
+
+  .filter_close_text {
+    margin: 0px 15px 0px 0px;
+    font-weight: 600;
+    text-decoration: underline;
+    color: $mainColor;
+  }
+  .search_box_container_div {
+    display: flex;
+    gap: 5px;
+    margin: 10px;
+    .MuiInputBase-root {
+      border: 1px solid $mainColor !important;
+    }
+  }
+
+  .cateLogDetail_TopBtn {
+    padding: 10px;
+  }
+
+  .catelog_searchmain_bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+
+    .MuiFormControl-root {
+      width: 100% !important;
+    }
+
+    .MuiInputBase-root {
+      width: 90% !important;
+      border: 1px solid $mainColor !important;
+    }
+
+    &.sticky {
+      position: fixed;
+      top: 0px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-top: 0px;
+      z-index: 99;
+      width: 100% !important;
+      background-color: $mainColor;
+
+      .Filter_icone_catelog {
+        color: white !important;
+      }
+
+      .catelog_deatil_top_searhcBox .MuiInputBase-input {
+        color: white !important;
+        border: 1px solid white !important;
+        border-radius: 5px !important;
+      }
+
+      .MuiInputBase-root {
+        width: 90% !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,127 @@
+import React from 'react';
+import { Box, Typography } from '@mui/material';
+import { motion } from 'framer-motion';
+
+/**
+ * Premium Page Header Component with Blur Effect
+ * Provides consistent styling across all pages
+ */
+const PageHeader = ({
+    leftContent,
+    centerContent,
+    rightContent,
+    centerTitle,
+    centerIcon: CenterIcon,
+    layout = 'centered',
+    sx = {}
+}) => {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            style={{ position: 'sticky', top: 0, zIndex: 100 }}
+        >
+        <Box
+            sx={{
+                bgcolor: 'rgba(255, 255, 255, 0.7)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.05)',
+                p: '4px 8px !important',
+                ...sx,
+            }}
+        >
+            <Box
+                sx={{
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: layout === 'fluid' ? 'space-between' : 'center',
+                    minHeight: '40px',
+                    gap: layout === 'fluid' ? { xs: 1, md: 2 } : 0,
+                    // Fluid headers wrap on small screens — center content
+                    // (catalog toggle + filter chips) drops to its own row
+                    ...(layout === 'fluid' && {
+                        flexWrap: 'wrap',
+                        rowGap: 0.5,
+                    }),
+                }}
+            >
+                {/* Left Section */}
+                {leftContent && (
+                    <Box
+                        sx={layout === 'centered' ? {
+                            position: 'absolute',
+                            left: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5
+                        } : {
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            flexShrink: 0
+                        }}
+                    >
+                        {leftContent}
+                    </Box>
+                )}
+
+                {/* Center Section */}
+                {(centerContent || centerTitle || CenterIcon) && (
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        ...(layout === 'fluid' ? {
+                            flex: { xs: '1 1 100%', md: 1 },
+                            order: { xs: 3, md: 0 },
+                            minWidth: 0,
+                            justifyContent: 'center'
+                        } : {})
+                    }}>
+                        {CenterIcon && <CenterIcon size={22} />}
+                        {centerTitle && (
+                            <Typography
+                                variant="h6"
+                                fontWeight={600}
+                                sx={{
+                                    fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                                    letterSpacing: '-0.01em',
+                                    color: 'inherit'
+                                }}
+                            >
+                                {centerTitle}
+                            </Typography>
+                        )}
+                        {centerContent}
+                    </Box>
+                )}
+
+                {/* Right Section */}
+                {rightContent && (
+                    <Box
+                        sx={layout === 'centered' ? {
+                            position: 'absolute',
+                            right: 0,
+                            display: 'flex',
+                            gap: 2,
+                            alignItems: 'center'
+                        } : {
+                            display: 'flex',
+                            gap: 2,
+                            alignItems: 'center',
+                            flexShrink: 0
+                        }}
+                    >
+                        {rightContent}
+                    </Box>
+                )}
+            </Box>
+        </Box>
+        </motion.div>
+    );
+};
+
+export default PageHeader;

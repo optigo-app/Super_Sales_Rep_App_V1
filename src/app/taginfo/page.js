@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Box, Typography, Button, CircularProgress, Dialog, DialogActions, DialogContent, Stack } from '@mui/material';
-import { AlignJustify, ArrowDownFromLine, ArrowUpFromLine, CircleX, Info, Keyboard, Printer, ScanLine, Share2, Trash } from 'lucide-react';
+import { AlignJustify, ChevronDown, ChevronUp, CircleX, Info, Keyboard, Printer, ScanLine, Share2, Trash } from 'lucide-react';
 import Header from '../../components/Header';
 import BottomNav from '../../components/BottomNav';
 import { CommonAPImainScan } from '@/Utils/API/CommonAPImain/CommonAPImainScan';
 import LoadingBackdrop from '@/Utils/LoadingBackdrop';
+import { showToast } from '@/components/Toast/ToastContainer';
 import PritnModel from './PritnModel';
 import dynamic from 'next/dynamic';
 
@@ -14,6 +15,7 @@ const Webcam = dynamic(() => import('react-webcam'), { ssr: false });
 
 const CANVAS_SIDE = 400;
 const SCAN_INTERVAL = 200;
+const PlaceHolderImg = '/V1/default.jpg';
 const hasBarcodeAPI = typeof window !== 'undefined' && 'BarcodeDetector' in window;
 
 export default function CustomerPage() {
@@ -105,7 +107,11 @@ export default function CustomerPage() {
         designNo: jobData.DesignNo,
         price: jobData.Amount,
         AmountWithtax: jobData.AmountWithtax,
-        taxAmount: jobData.TaxAmount,
+        taxAmount:
+          (jobData.TaxAmount || 0) +
+          (jobData.SGSTAmount || 0) +
+          (jobData.CGSTAmount || 0) +
+          (jobData.IGSTAmount || 0),
         MetalTypeTitle: `${jobData?.MetalPurity} ${jobData?.MetalTypeName} ${jobData?.MetalColorName}`,
         netWeight: jobData.NetWt?.toFixed(3),
         GrossWeight: jobData.GrossWt?.toFixed(3),
@@ -271,7 +277,7 @@ export default function CustomerPage() {
             <Typography sx={{ fontSize: 14, color: 'text.secondary' }}>{activeDetail.Category}</Typography>
           </Box>
           <Typography sx={{ fontSize: 15, fontWeight: 600, color: '#7C3AED' }}>
-            ₹{activeDetail.AmountWithtax}
+            Amt {activeDetail.AmountWithtax}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -282,7 +288,7 @@ export default function CustomerPage() {
               style={{ width: '100%', borderRadius: 8 }}
             />
           </Box>
-          <Box sx={{ width: '65%', fontSize: 12 }}>
+          <Box sx={{ width: '65%', fontSize: 12, display: 'flex', flexDirection: 'column', minHeight: '120px' }}>
             <Typography sx={{ fontSize: 12, fontWeight: 600, mb: 0.5 }}>
               Metal: {activeDetail.MetalTypeTitle}
             </Typography>
@@ -320,9 +326,19 @@ export default function CustomerPage() {
                 </Box>
               )}
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 'auto', pt: 1 }}>
               <Button
-                sx={{ color: '#b8860b', minWidth: 36, p: 0 }}
+                sx={{
+                  color: '#7C3AED',
+                  bgcolor: '#EDE9FE',
+                  minWidth: 36,
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  p: 0,
+                  '&:active': { bgcolor: '#DDD6FE', transform: 'scale(0.92)' },
+                  transition: 'all 0.15s',
+                }}
                 onClick={() => {
                   setPrintOption(true);
                   setPrintAllData(false);
@@ -333,7 +349,17 @@ export default function CustomerPage() {
                 <Printer size={18} />
               </Button>
               <Button
-                sx={{ color: '#b8860b', minWidth: 36, p: 0 }}
+                sx={{
+                  color: '#7C3AED',
+                  bgcolor: '#EDE9FE',
+                  minWidth: 36,
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  p: 0,
+                  '&:active': { bgcolor: '#DDD6FE', transform: 'scale(0.92)' },
+                  transition: 'all 0.15s',
+                }}
                 onClick={() => {
                   setPrintOption(false);
                   setOpenPrintModel(true);
@@ -343,13 +369,23 @@ export default function CustomerPage() {
                 <Share2 size={18} />
               </Button>
               <Button
-                sx={{ color: '#b8860b', minWidth: 36, p: 0 }}
+                sx={{
+                  color: '#7C3AED',
+                  bgcolor: '#EDE9FE',
+                  minWidth: 36,
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  p: 0,
+                  '&:active': { bgcolor: '#DDD6FE', transform: 'scale(0.92)' },
+                  transition: 'all 0.15s',
+                }}
                 onClick={() => {
                   setIsOpen(true);
                   setPriceBreackUpAllValues(activeDetail);
                 }}
               >
-                <Info style={{ fontSize: 20 }} />
+                <Info size={20} />
               </Button>
             </Box>
           </Box>
@@ -358,10 +394,8 @@ export default function CustomerPage() {
     );
 
   return (
-    <Box sx={{ bgcolor: '#F5F3FF', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: 'white', minHeight: '100vh' }}>
       <LoadingBackdrop isLoading={isLoading} />
-      <Header />
-
       {/* Price Breakup Drawer */}
       <Box
         sx={{
@@ -388,38 +422,41 @@ export default function CustomerPage() {
             position: 'relative',
             bgcolor: '#fff',
             borderRadius: '16px 16px 0 0',
-            p: 2,
+            p: "16px 16px 110px 16px",
             transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
             transition: 'transform .3s',
           }}
         >
           <Typography sx={{ fontSize: 16, fontWeight: 500, mb: 1.5 }}>Price Breakup</Typography>
+          <Typography sx={{ fontSize: 12, fontWeight: 500, display: 'flex', justifyContent: 'flex-end' }}>Amt</Typography>
           {[
             ['Metal (incl. finding)', priceBreackUpAllValues?.TotalMetalCost],
             ['Diamond', priceBreackUpAllValues?.TotalDiamondWtPrice],
             ['Color Stone', priceBreackUpAllValues?.TotalColosrStoneWtPrice],
             ['Misc', priceBreackUpAllValues?.TotalMiscWtPrice],
             ['Making Charges', priceBreackUpAllValues?.TotalMakingWtPrice],
-            ['Tax Amount', priceBreackUpAllValues?.taxAmount],
+            ['Tax Amount', Number(priceBreackUpAllValues?.taxAmount || 0).toFixed(2)],
           ].map(([label, val]) => (
             <Box
               key={label}
               sx={{ display: 'flex', justifyContent: 'space-between', py: 0.75, borderBottom: '0.5px solid #eee' }}
             >
               <Typography sx={{ fontSize: 13, color: 'text.secondary' }}>{label}</Typography>
-              <Typography sx={{ fontSize: 13 }}>₹ {val}</Typography>
+              <Typography sx={{ fontSize: 13 }}>{val}</Typography>
             </Box>
           ))}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1 }}>
             <Typography sx={{ fontWeight: 600 }}>Total</Typography>
             <Typography sx={{ fontWeight: 600, color: '#7C3AED' }}>
-              ₹{' '}
-              {(priceBreackUpAllValues?.TotalMetalCost || 0) +
+              Amt{' '}
+              {Number(
+                (priceBreackUpAllValues?.TotalMetalCost || 0) +
                 (priceBreackUpAllValues?.TotalDiamondWtPrice || 0) +
                 (priceBreackUpAllValues?.TotalColosrStoneWtPrice || 0) +
                 (priceBreackUpAllValues?.TotalMiscWtPrice || 0) +
                 (priceBreackUpAllValues?.TotalMakingWtPrice || 0) +
-                (priceBreackUpAllValues?.taxAmount || 0)}
+                (priceBreackUpAllValues?.taxAmount || 0)
+              ).toFixed(2)}
             </Typography>
           </Box>
           <Button
@@ -449,7 +486,7 @@ export default function CustomerPage() {
               sx={{
                 flex: 1,
                 fontSize: 12,
-                py: 0.75,
+                p: 1,
                 ...(mode === m.key
                   ? { bgcolor: '#7C3AED', '&:hover': { bgcolor: '#6D28D9' } }
                   : {}),
@@ -580,9 +617,9 @@ export default function CustomerPage() {
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Typography sx={{ fontSize: 14, fontWeight: 600, color: '#7C3AED' }}>
-                        ₹{data.AmountWithtax}
+                        Amt {data.AmountWithtax}
                       </Typography>
-                      {expandedItems.includes(idx) ? <ArrowUpFromLine /> : <ArrowDownFromLine />}
+                      {expandedItems.includes(idx) ? <ChevronUp size={18} color="#9CA3AF" /> : <ChevronDown size={18} color="#9CA3AF" />}
                     </Box>
                   </Box>
 
@@ -595,7 +632,7 @@ export default function CustomerPage() {
                           style={{ width: '100%', borderRadius: 8 }}
                         />
                       </Box>
-                      <Box sx={{ width: '65%', fontSize: 12 }}>
+                      <Box sx={{ width: '65%', fontSize: 12, display: 'flex', flexDirection: 'column', minHeight: '120px' }}>
                         <Typography sx={{ fontSize: 12, fontWeight: 600, mb: 0.5 }}>
                           Metal: {data.MetalTypeTitle}
                         </Typography>
@@ -633,15 +670,35 @@ export default function CustomerPage() {
                             </Box>
                           )}
                         </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 1 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 'auto', pt: 1 }}>
                           <Button
-                            sx={{ color: '#b8860b', minWidth: 36, p: 0 }}
+                            sx={{
+                  color: '#E24B4A',
+                  bgcolor: '#FFF0F0',
+                  minWidth: 36,
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  p: 0,
+                  '&:active': { bgcolor: '#FECACA', transform: 'scale(0.92)' },
+                  transition: 'all 0.15s',
+                }}
                             onClick={() => { setOpenCnfDialog(true); setRemoveJobNo(data.JobNo); }}
                           >
                             <Trash size={16} />
                           </Button>
                           <Button
-                            sx={{ color: '#b8860b', minWidth: 36, p: 0 }}
+                            sx={{
+                  color: '#7C3AED',
+                  bgcolor: '#EDE9FE',
+                  minWidth: 36,
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  p: 0,
+                  '&:active': { bgcolor: '#DDD6FE', transform: 'scale(0.92)' },
+                  transition: 'all 0.15s',
+                }}
                             onClick={() => {
                               setPrintOption(true);
                               setPrintAllData(false);
@@ -652,7 +709,17 @@ export default function CustomerPage() {
                             <Printer size={16} />
                           </Button>
                           <Button
-                            sx={{ color: '#b8860b', minWidth: 36, p: 0 }}
+                            sx={{
+                  color: '#7C3AED',
+                  bgcolor: '#EDE9FE',
+                  minWidth: 36,
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  p: 0,
+                  '&:active': { bgcolor: '#DDD6FE', transform: 'scale(0.92)' },
+                  transition: 'all 0.15s',
+                }}
                             onClick={() => {
                               setPrintOption(false);
                               setOpenPrintModel(true);
@@ -662,10 +729,20 @@ export default function CustomerPage() {
                             <Share2 size={16} />
                           </Button>
                           <Button
-                            sx={{ color: '#b8860b', minWidth: 36, p: 0 }}
+                            sx={{
+                  color: '#7C3AED',
+                  bgcolor: '#EDE9FE',
+                  minWidth: 36,
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  p: 0,
+                  '&:active': { bgcolor: '#DDD6FE', transform: 'scale(0.92)' },
+                  transition: 'all 0.15s',
+                }}
                             onClick={() => { setIsOpen(true); setPriceBreackUpAllValues(data); }}
                           >
-                            <Info Fill style={{ fontSize: 18 }} />
+                            <Info size={18} />
                           </Button>
                         </Box>
                       </Box>
@@ -678,7 +755,7 @@ export default function CustomerPage() {
               <Button
                 sx={{
                   position: 'fixed',
-                  bottom: 80,
+                  bottom: 100,
                   right: 20,
                   bgcolor: '#2196f3',
                   color: '#fff',
@@ -719,13 +796,24 @@ export default function CustomerPage() {
           </Button>
         </DialogActions>
       </Dialog>
-      {/* <ConfirmationDialog
-        open={opencnfDialogOpen}
-        onClose={() => setOpenCnfDialog(false)}
-        onConfirm={handleConfirmRemoveAll}
-        title="Confirm"
-        content="Are you sure you want to remove this item?"
-      /> */}
+      <Dialog open={opencnfDialogOpen} onClose={() => setOpenCnfDialog(false)} maxWidth="xs" fullWidth>
+        <DialogContent>
+          <Typography sx={{ fontSize: 15, color: '#1F2937' }}>
+            Are you sure you want to remove this item?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenCnfDialog(false)} color="error">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmRemoveAll}
+            sx={{ bgcolor: '#7C3AED', color: '#fff', '&:hover': { bgcolor: '#6D28D9' } }}
+          >
+            Remove
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <BottomNav />
     </Box>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Avatar, Chip } from '@mui/material';
 import {
   Search, Phone, ChevronRight, Plus,
@@ -335,7 +335,7 @@ function AddCustomerModal({ open, onClose, onSaved }) {
                         px: 2, py: 1.25, fontSize: 14, cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         color: form.companyTypeId === ct.CompanyTypeId ? '#7C3AED' : '#1F2937',
-                        bgcolor: form.companyTypeId === ct.CompanyTypeId ? '#F5F3FF' : '#fff',
+                        bgcolor: form.companyTypeId === ct.CompanyTypeId ? 'white' : '#fff',
                         borderBottom: '1px solid #F3F4F6',
                         fontWeight: form.companyTypeId === ct.CompanyTypeId ? 600 : 400,
                         '&:last-child': { borderBottom: 'none' },
@@ -426,6 +426,12 @@ function getInitial(item) {
 function getStatus(item) {
   return item._status || 'active';
 }
+function formatDate(value) {
+  if (!value) return '';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
 
 // ─── CustomerPage ─────────────────────────────────────────────
 export default function CustomerPage() {
@@ -459,6 +465,14 @@ export default function CustomerPage() {
 
   useEffect(() => { fetchNew(); fetchActive(); fetchInactive(); }, []);
   const handleSaved = () => { fetchNew(); fetchActive(); fetchInactive(); };
+  const chipRefs = useRef({});
+
+  useEffect(() => {
+    const el = chipRefs.current[activeFilter];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeFilter]);
 
   const sourceList = (() => {
     if (activeFilter === 'New') return newRows;
@@ -467,18 +481,19 @@ export default function CustomerPage() {
     return [...newRows, ...activeRows, ...inactiveRows];
   })();
 
-  const filtered = sourceList.filter((c) => {
-    const name = (c.FLname || c.Name || '').toLowerCase();
-    const company = (c.CompanyName || c.Company || '').toLowerCase();
-    const q = search.toLowerCase();
-    return name.includes(q) || company.includes(q);
-  });
-
+  const filtered = sourceList
+    .filter((c) => {
+      const name = (c.FLname || c.Name || '').toLowerCase();
+      const company = (c.CompanyName || c.Company || '').toLowerCase();
+      const code = (c.CustomerCode || '').toLowerCase();
+      const q = search.toLowerCase();
+      return name.includes(q) || company.includes(q) || code.includes(q);
+    })
+    .sort((a, b) => new Date(b.EntryDate || 0) - new Date(a.EntryDate || 0));
+  
   return (
     <Box sx={{ bgcolor: '#F8F7FF', minHeight: '100vh' }}>
       <LoadingBackdrop isLoading={isLoading} />
-      <Header />
-
       <Box sx={{ px: 2, pt: 2, pb: '90px' }}>
 
         {/* Page title + count */}
@@ -507,7 +522,7 @@ export default function CustomerPage() {
             component="input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or company…"
+            placeholder="Search by name, company or code…"
             sx={{
               flex: 1, border: 'none', outline: 'none', fontSize: 14,
               color: '#1F2937', bgcolor: 'transparent', fontFamily: 'inherit',
@@ -524,11 +539,12 @@ export default function CustomerPage() {
         {/* Filter chips */}
         <Box sx={{ display: 'flex', gap: 0.75, mb: 2.5, overflowX: 'auto', pb: 0.5, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
           {filters.map((f) => {
-            const counts = { All: sourceList.length, New: newRows.length, Active: activeRows.length, Inactive: inactiveRows.length };
+            const counts = { All: newRows.length + activeRows.length + inactiveRows.length, New: newRows.length, Active: activeRows.length, Inactive: inactiveRows.length };
             const active = activeFilter === f;
             return (
               <Box
                 key={f}
+                ref={(node) => { chipRefs.current[f] = node; }}
                 onClick={() => setActiveFilter(f)}
                 sx={{
                   flexShrink: 0, display: 'flex', alignItems: 'center', gap: 0.6,
@@ -590,7 +606,7 @@ export default function CustomerPage() {
                 }}
                 onClick={() => {
                   sessionStorage.setItem('selectedCustomer', JSON.stringify(c));
-                  router.push(`/customer/${c.id}`);
+                  router.push(`/customer/${c.CustomerId}`);
                 }}
               >
                 {/* Avatar */}
@@ -615,6 +631,11 @@ export default function CustomerPage() {
                     <Box sx={{ flexShrink: 0, bgcolor: sc.bg, color: sc.color, fontSize: 9, fontWeight: 700, px: 0.8, py: 0.2, borderRadius: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                       {status}
                     </Box>
+                    {c.EntryDate && (
+                      <Typography sx={{ fontSize: 11, color: '#9CA3AF', ml: 'auto', flexShrink: 0 }}>
+                        {formatDate(c.EntryDate)}
+                      </Typography>
+                    )}
                   </Box>
                   {company && (
                     <Typography sx={{ fontSize: 12, color: '#6B7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

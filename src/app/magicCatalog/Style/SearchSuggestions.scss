@@ -1,0 +1,262 @@
+$primary-color: #7367f0;
+$text-primary: #334155; // Darker, sharper text
+$text-secondary: #64748b;
+$bg-color: rgba(255, 255, 255, 0.95); // Slightly more opaque for better readability
+$border-color: rgba(226, 232, 240, 0.8);
+
+// Category Colors
+$color-design: #059669; // Emerald
+$color-collection: #7c3aed; // Violet
+$color-brand: #d97706; // Amber
+$color-category: #2563eb; // Blue
+$color-metal: #475569; // Slate
+$color-default: #7367f0; // Primary
+$color-gender: #e11d48; // Rose
+$color-style: #06b6d4; // Cyan
+$color-occasion: #f97316; // Orange
+$color-producttype: #6366f1; // Indigo
+$color-subcategory: #d946ef; // Fuchsia
+
+.search-suggestions-container {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 1200;
+    border-radius: 16px;
+    background: $bg-color;
+    backdrop-filter: blur(24px) saturate(180%); // Enhanced glass effect
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 16px !important;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 15px -3px rgba(0, 0, 0, 0.05),
+        0 20px 40px rgba(0, 0, 0, 0.04), // Deep ambient shadow
+        inset 0 0 0 1px rgba(255, 255, 255, 0.6); // Inner ring for sharpness
+    padding: 12px;
+    animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1); // Apple-like spring
+    max-height: 450px;
+    overflow-y: auto;
+
+    &.position-top {
+        top: auto;
+        bottom: calc(100% + 8px);
+        animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    &::-webkit-scrollbar {
+        width: 6px; // Thinner
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        margin: 4px 0;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 10px;
+
+        &:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+    }
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+.suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 16px;
+
+    &.single-group {
+        grid-template-columns: 1fr;
+        gap: 8px;
+
+        .suggestion-group {
+            border: none;
+            padding: 0;
+        }
+    }
+
+    &.two-groups {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    &.three-groups {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+.suggestion-group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px 8px 8px;
+    margin-bottom: 6px;
+    border-bottom: 2px solid transparent; // Reserve space
+    border-radius: 4px;
+
+    .suggestion-group-title {
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+    }
+}
+
+// Mixin for type styling
+@mixin type-color($color) {
+    .suggestion-group-header {
+        color: $color;
+        border-bottom-color: rgba($color, 0.1);
+
+        svg {
+            color: $color;
+            filter: drop-shadow(0 2px 4px rgba($color, 0.2));
+        }
+    }
+
+    .suggestion-item {
+        &:hover {
+            background-color: rgba($color, 0.06);
+            color: $color;
+        }
+
+        &.selected {
+            background-color: rgba($color, 0.1);
+            box-shadow: 0 4px 12px rgba($color, 0.15); // Glow effect
+
+            .suggestion-label {
+                color: $color;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+.suggestion-group {
+    &.group-design {
+        @include type-color($color-design);
+
+        &.two-column-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+
+            .suggestion-group-header {
+                grid-column: 1 / -1; // Span full width
+            }
+        }
+    }
+
+    &.group-collection {
+        @include type-color($color-collection);
+    }
+
+    &.group-brand {
+        @include type-color($color-brand);
+    }
+
+    &.group-category {
+        @include type-color($color-category);
+    }
+
+    &.group-metaltype {
+        @include type-color($color-metal);
+    }
+
+    &.group-metalcolor {
+        @include type-color(#db2777);
+    }
+
+    &.group-gender {
+        @include type-color($color-gender);
+    }
+
+    &.group-style {
+        @include type-color($color-style);
+    }
+
+    &.group-occasion {
+        @include type-color($color-occasion);
+    }
+
+    &.group-producttype {
+        @include type-color($color-producttype);
+    }
+
+    &.group-subcategory {
+        @include type-color($color-subcategory);
+    }
+
+    // Pink for Rose Gold concept
+    &.group-default {
+        @include type-color($color-default);
+    }
+}
+
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent; // Prevent layout shift on selected
+
+    .suggestion-label {
+        font-weight: 500;
+        color: $text-primary;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+// Mobile responsiveness
+@media (max-width: 600px) {
+    .search-suggestions-container {
+        max-height: 50vh; // Dynamic height
+        padding: 12px;
+
+        // On mobile, collapse grid to single column always for better touch area
+        .suggestions-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px;
+        }
+    }
+
+    .suggestion-item {
+        padding: 12px 14px; // Larger touch targets
+    }
+}

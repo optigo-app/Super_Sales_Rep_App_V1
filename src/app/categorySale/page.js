@@ -50,8 +50,6 @@ export default function categorySale(props) {
                     sessionStorage.getItem("dashboardData")
                 );
 
-                console.log('storedCategorySaleData: ', storedCategorySaleData?.category);
-
                 if (storedCategorySaleData && storedCategorySaleData !== "undefined") {
                     setCategorySaleData(storedCategorySaleData?.category || []);
                 }
@@ -77,8 +75,6 @@ export default function categorySale(props) {
             },
         ],
     };
-    console.log('dataPolar: ', dataPolar);
-
     const optionsPolar = {
         responsive: true,
         maintainAspectRatio: false,
@@ -118,13 +114,7 @@ export default function categorySale(props) {
     };
 
     return (
-        <Box sx={{ bgcolor: '#F5F3FF', minHeight: '100vh' }}>
-            <Header
-                rightContent={
-                    <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 15, fontWeight: 700 }}>E</Box>
-                }
-            />
-
+        <Box sx={{ bgcolor: 'white', minHeight: '100vh' }}>
             <Box sx={{ px: 2, pt: 1.5, pb: '80px' }}>
                 {/* Back + Title */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
@@ -143,7 +133,6 @@ export default function categorySale(props) {
                     </div>
                 </div>
             </Box>
-            <BottomNav />
         </Box>
     );
 }

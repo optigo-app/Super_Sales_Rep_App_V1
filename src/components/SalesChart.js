@@ -42,7 +42,7 @@ export default function SalesChart({ data }) {
             boxShadow: '0 4px 16px rgba(124,58,237,0.12)',
           }}
           formatter={(value) =>
-            [`₹${value.toLocaleString('en-IN')}`, undefined]
+            [`Amt ${value.toLocaleString('en-IN')}`, undefined]
           }
         />
         <Legend

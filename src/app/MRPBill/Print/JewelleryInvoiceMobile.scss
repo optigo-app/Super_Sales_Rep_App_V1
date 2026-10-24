@@ -1,0 +1,258 @@
+$gold: #c9a84c;
+$gold-light: #f0d98a;
+$dark: #1a1a2e;
+$white: #ffffff;
+$bg: #f5f3ef;
+$border: #e0d9cc;
+$text: #1a1a1a;
+$muted: #6b6560;
+$radius: 14px;
+$radius-sm: 8px;
+
+.mob-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: mobFade 0.2s ease;
+  box-sizing: border-box;
+}
+@keyframes mobFade { from { opacity: 0; } to { opacity: 1; } }
+
+.mob-overlay--silent {
+  animation: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  .mob-sheet {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.mob-sheet {
+  width: 100%;
+  max-width: 480px;
+  height: 94vh;
+  background: $white;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: mobUp 0.3s cubic-bezier(0.34,1.4,0.64,1);
+  box-sizing: border-box;
+}
+@keyframes mobUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.mob-handle {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 6px;
+  flex-shrink: 0;
+  span { width: 36px; height: 4px; background: #d0ccc5; border-radius: 2px; }
+}
+
+.mob-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid $border;
+
+  &__title { font-size: 16px; font-weight: 800; color: $dark; }
+  &__sub { font-size: 11px; color: $muted; margin-top: 1px; }
+  &__close {
+    width: 34px; height: 34px; border: none; background: #f0ede8;
+    border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 20px; color: $text; cursor: pointer;
+    &:active { background: #e0dbd3; }
+  }
+}
+
+.mob-body {
+  flex: 1;
+  overflow-y: auto;
+  background: $bg;
+  padding: 12px;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.mob-footer {
+  flex-shrink: 0;
+  padding: 12px 14px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  background: $white;
+  border-top: 1px solid $border;
+  display: flex;
+  gap: 10px;
+
+  button {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 14px; border: none; border-radius: $radius-sm;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: transform 0.1s, opacity 0.15s;
+    &:active { transform: scale(0.97); opacity: 0.85; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &.btn-pdf { background: rgba(0, 162, 225, 0.1); color: $dark; }
+    &.btn-share { background: #dcfce7; color: $dark; }
+  }
+}
+
+/* ── Company ── */
+.mob-company {
+  background: rgba(0, 162, 225, 0.1); border-radius: $radius; padding: 14px;
+  margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start;
+
+  &__logo { width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: rgba(0,162,225,0.08); flex-shrink: 0; }
+  &__name { font-size: 14px; font-weight: 800; color: $dark; margin-bottom: 3px; line-height: 1.3; }
+  &__line { font-size: 10.5px; color: $muted; line-height: 1.5; word-break: break-word; }
+  &__badge {
+    display: inline-block; background: $gold; color: $dark;
+    font-size: 9px; font-weight: 800; padding: 2px 8px;
+    border-radius: 20px; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+}
+
+/* ── Meta grid ── */
+.mob-meta {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;
+
+  &__cell { background: $white; border-radius: $radius-sm; padding: 10px 12px; border: 1px solid $border; }
+  &__label { font-size: 9.5px; color: $muted; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+  &__value { font-size: 13px; font-weight: 700; color: $text; word-break: break-all; }
+}
+
+/* ── Customer ── */
+.mob-customer {
+  background: $white; border-radius: $radius; padding: 13px 14px;
+  margin-bottom: 10px; border: 1px solid $border;
+
+  &__to { font-size: 9.5px; color: $muted; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 5px; }
+  &__name { font-size: 14px; font-weight: 800; color: $dark; margin-bottom: 4px; }
+  &__addr { font-size: 12px; color: $muted; line-height: 1.6; margin-bottom: 4px; }
+  &__row { font-size: 12px; color: $muted; line-height: 1.8; strong { color: $text; font-weight: 600; } }
+  &__divider { height: 1px; background: $border; margin: 8px 0; }
+  &__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  &__tag {
+    font-size: 10.5px; background: $bg; border: 1px solid $border;
+    border-radius: 20px; padding: 2px 10px; color: $text;
+    strong { color: $dark; }
+  }
+}
+
+/* ── Section label ── */
+.mob-section-label {
+  font-size: 10px; font-weight: 700; color: $muted;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin: 14px 0 7px; padding-left: 2px;
+}
+
+/* ── Item card ── */
+.mob-item {
+  background: $white; border-radius: $radius; border: 1px solid $border;
+  margin-bottom: 10px; overflow: hidden;
+
+  &__top { display: flex; gap: 12px; padding: 12px; }
+
+  &__img {
+    width: 76px; height: 76px; object-fit: cover;
+    border-radius: $radius-sm; border: 1px solid $border;
+    flex-shrink: 0; background: $bg;
+  }
+  &__img-placeholder {
+    width: 76px; height: 76px; border-radius: $radius-sm;
+    background: $bg; border: 1px solid $border; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: $muted; font-size: 22px;
+  }
+
+  &__info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  &__sr { font-size: 9.5px; color: $muted; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  &__codes { font-size: 13px; font-weight: 700; color: $dark; margin-bottom: 2px; }
+  &__sub { font-size: 11.5px; color: $muted; line-height: 1.4; flex: 1; }
+  &__amount { margin-top: 8px; font-size: 16px; font-weight: 800; color: $dark; }
+
+  &__desc {
+    border-top: 1px dashed $border; padding: 10px 12px;
+    p { font-size: 11.5px; color: $muted; line-height: 1.6; margin-bottom: 3px; &:last-child { margin-bottom: 0; } }
+  }
+  &__material { font-size: 11.5px; color: $muted; padding: 2px 0; line-height: 1.5; strong { color: $text; font-weight: 600; } }
+
+  &__remark {
+    margin-top: 7px; padding: 7px 10px;
+    background: #fff9ec; border-left: 3px solid $gold;
+    border-radius: 0 $radius-sm $radius-sm 0;
+    &-title { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: darken($gold,10%); margin-bottom: 2px; }
+    p { font-size: 12px; color: $text; }
+  }
+}
+
+/* ── Summary ── */
+.mob-summary {
+  background: $white; border-radius: $radius; border: 1px solid $border;
+  overflow: hidden; margin-bottom: 10px;
+
+  &__row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; border-bottom: 1px solid $border;
+    &:last-child { border-bottom: none; }
+    &--subtotal { background: $bg; .mob-summary__lbl { font-weight: 700; color: $text; } }
+    &--grand {
+      background: $dark; padding: 13px 14px;
+      .mob-summary__lbl { color: $white; font-weight: 700; font-size: 14px; }
+      .mob-summary__val { color: $gold-light; font-weight: 800; font-size: 16px; }
+    }
+  }
+  &__lbl { font-size: 13px; color: $muted; }
+  &__val { font-size: 13px; font-weight: 700; color: $text; }
+}
+
+/* ── Weights ── */
+.mob-weights {
+  background: $white; border-radius: $radius; border: 1px solid $border;
+  padding: 12px 14px; margin-bottom: 10px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+
+  &__item { display: flex; flex-direction: column; gap: 2px; }
+  &__lbl { font-size: 9.5px; color: $muted; text-transform: uppercase; letter-spacing: 0.5px; }
+  &__val { font-size: 13px; font-weight: 700; color: $text; }
+}
+
+/* ── Remark block ── */
+.mob-remark {
+  background: $white; border-radius: $radius; border: 1px solid $border;
+  padding: 13px 14px; margin-bottom: 10px;
+
+  &__title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: $muted; margin-bottom: 7px; }
+  &__content { font-size: 12px; color: $text; line-height: 1.7; }
+}
+
+/* ── Bank ── */
+.mob-bank {
+  background: $white; border-radius: $radius; border: 1px solid $border;
+  padding: 13px 14px; margin-bottom: 10px;
+
+  &__title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: $muted; margin-bottom: 8px; }
+  &__row { font-size: 12.5px; color: $text; line-height: 1.8; }
+}
+
+/* ── Signatures ── */
+.mob-signatures {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;
+
+  &__box {
+    background: $white; border: 1px solid $border; border-radius: $radius;
+    padding: 12px; min-height: 80px; display: flex; flex-direction: column; justify-content: space-between;
+  }
+  &__label { font-size: 11px; color: $muted; }
+  &__name { font-size: 12px; font-weight: 700; color: $dark; margin-top: 8px; }
+}
+
+/* ── Notice ── */
+.mob-notice { font-size: 10px; color: $muted; text-align: center; line-height: 1.6; padding: 8px 4px 16px; font-style: italic; }
+.mob-error { padding: 40px 20px; text-align: center; font-size: 15px; font-weight: 700; color: #c0392b; }

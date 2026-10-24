@@ -12,6 +12,10 @@ const nextConfig = {
 
   webpack: (config) => {
     config.cache = false;
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@mc": path.join(process.cwd(), "src/app/magicCatalog"),
+    };
     return config;
   },
 };

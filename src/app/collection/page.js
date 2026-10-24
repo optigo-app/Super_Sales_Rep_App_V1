@@ -9,12 +9,12 @@ import BottomNav from '../../components/BottomNav';
 const categories = ['All', 'Gold', 'Diamond', 'Silver', 'Gems'];
 
 const products = [
-  { id: '1', name: 'Gold Necklace Set',  code: 'GN-001', weight: '25g', price: '₹45,000',  category: 'Gold',    bg: '#FEF9C3', inStock: true  },
-  { id: '2', name: 'Diamond Ring',        code: 'DR-002', weight: '5g',  price: '₹85,000',  category: 'Diamond', bg: '#EDE9FE', inStock: true  },
-  { id: '3', name: 'Silver Bracelet',     code: 'SB-003', weight: '15g', price: '₹12,000',  category: 'Silver',  bg: '#F1F5F9', inStock: false },
-  { id: '4', name: 'Gold Earrings',       code: 'GE-004', weight: '8g',  price: '₹28,000',  category: 'Gold',    bg: '#FEF9C3', inStock: true  },
-  { id: '5', name: 'Gemstone Pendant',    code: 'GP-005', weight: '6g',  price: '₹32,000',  category: 'Gems',    bg: '#FCE7F3', inStock: true  },
-  { id: '6', name: 'Diamond Bracelet',    code: 'DB-006', weight: '12g', price: '₹1,20,000', category: 'Diamond', bg: '#EDE9FE', inStock: true  },
+  { id: '1', name: 'Gold Necklace Set',  code: 'GN-001', weight: '25g', price: 'Amt 45,000',  category: 'Gold',    bg: '#FEF9C3', inStock: true  },
+  { id: '2', name: 'Diamond Ring',        code: 'DR-002', weight: '5g',  price: 'Amt 85,000',  category: 'Diamond', bg: '#EDE9FE', inStock: true  },
+  { id: '3', name: 'Silver Bracelet',     code: 'SB-003', weight: '15g', price: 'Amt 12,000',  category: 'Silver',  bg: '#F1F5F9', inStock: false },
+  { id: '4', name: 'Gold Earrings',       code: 'GE-004', weight: '8g',  price: 'Amt 28,000',  category: 'Gold',    bg: '#FEF9C3', inStock: true  },
+  { id: '5', name: 'Gemstone Pendant',    code: 'GP-005', weight: '6g',  price: 'Amt 32,000',  category: 'Gems',    bg: '#FCE7F3', inStock: true  },
+  { id: '6', name: 'Diamond Bracelet',    code: 'DB-006', weight: '12g', price: 'Amt 1,20,000', category: 'Diamond', bg: '#EDE9FE', inStock: true  },
 ];
 
 function JewelryPlaceholder({ bg }) {
@@ -48,7 +48,7 @@ export default function CollectionPage() {
   }
 
   return (
-    <Box sx={{ bgcolor: '#F5F3FF', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: 'white', minHeight: '100vh' }}>
       <Header />
 
       <Box sx={{ px: 2, pt: 2, pb: '80px' }}>
@@ -121,7 +121,7 @@ export default function CollectionPage() {
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             {filtered.map((p) => (
-              <Box key={p.id} sx={{ bgcolor: '#fff', borderRadius: "10px", p: 1.5, boxShadow: '0 1px 6px rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.06)', display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', '&:active': { transform: 'scale(0.98)', bgcolor: '#F5F3FF' }, transition: 'all 0.15s', position: 'relative' }}>
+              <Box key={p.id} sx={{ bgcolor: '#fff', borderRadius: "10px", p: 1.5, boxShadow: '0 1px 6px rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.06)', display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', '&:active': { transform: 'scale(0.98)', bgcolor: 'white' }, transition: 'all 0.15s', position: 'relative' }}>
                 <Box sx={{ width: 60, height: 60, borderRadius: 2, bgcolor: p.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>💍</Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography sx={{ fontSize: 14, fontWeight: 700, color: '#1F2937', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</Typography>

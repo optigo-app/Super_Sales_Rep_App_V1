@@ -1,0 +1,10 @@
+.scanner-container {
+    width: 200px;
+    height: 200px;
+  }
+  .container_barcode{
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 4rem;
+    border: 1px solid #e8e8e8;
+  }

@@ -152,7 +152,7 @@ export default function DashboardTab({ customerId }) {
           { icon: TrendingUp,  bg: '#ECFDF5', color: '#10B981', value: paymentData.length  || '0', label: 'Payments' },
           { icon: PhoneCall,   bg: '#FFF7ED', color: '#F97316', value: callLogs.length     || '0', label: 'Call Logs' },
         ].map(({ icon: Icon, bg, color, value, label }) => (
-          <Box key={label} sx={{ bgcolor: '#F5F3FF', borderRadius: 2.5, p: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+          <Box key={label} sx={{ bgcolor: 'white', borderRadius: 2.5, p: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
             <Box sx={{ width: 36, height: 36, borderRadius: 1.5, bgcolor: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 0.3 }}>
               <Icon size={17} color={color} strokeWidth={2.2} />
             </Box>
@@ -176,7 +176,7 @@ export default function DashboardTab({ customerId }) {
           <Box sx={{ border: '1px solid rgba(124,58,237,0.1)', borderTop: 'none', borderRadius: '0 0 8px 8px', overflow: 'hidden' }}>
             {lastOrderData.map((order, index) => (
               <Box key={order.SrNo ?? index}
-                sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', px: 1.5, py: 1.1, bgcolor: index % 2 === 0 ? '#fff' : '#F5F3FF', borderBottom: index < lastOrderData.length - 1 ? '1px solid rgba(124,58,237,0.07)' : 'none', alignItems: 'center' }}>
+                sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', px: 1.5, py: 1.1, bgcolor: index % 2 === 0 ? '#fff' : 'white', borderBottom: index < lastOrderData.length - 1 ? '1px solid rgba(124,58,237,0.07)' : 'none', alignItems: 'center' }}>
                 <Typography sx={{ fontSize: 12, color: '#1F2937', textAlign: 'center', fontWeight: 600 }}>{order.JobVersionNo || '—'}</Typography>
                 <Typography sx={{ fontSize: 12, color: '#6B7280', textAlign: 'center' }}>{order.categorycode || '—'}</Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -213,7 +213,7 @@ export default function DashboardTab({ customerId }) {
               <Box key={payment.SrNo ?? index}
                 sx={{ display: 'grid', gridTemplateColumns: '0.4fr 1fr 1fr', px: 1.5, py: 1.1, bgcolor: index % 2 === 0 ? '#fff' : '#F0FDF4', borderBottom: index < paymentData.length - 1 ? '1px solid rgba(16,185,129,0.08)' : 'none' }}>
                 <Typography sx={{ fontSize: 12, color: '#6B7280', textAlign: 'center' }}>{index + 1}</Typography>
-                <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#10B981', textAlign: 'center' }}>₹{payment.Amount}</Typography>
+                <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#10B981', textAlign: 'center' }}>Amt {payment.Amount}</Typography>
                 <Typography sx={{ fontSize: 12, color: '#6B7280', textAlign: 'center' }}>{payment.PaymentDate}</Typography>
               </Box>
             ))}

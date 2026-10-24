@@ -161,7 +161,11 @@ const Scanner = () => {
         designNo: jobData.DesignNo,
         price: jobData.Amount,
         AmountWithtax: jobData.AmountWithtax,
-        taxAmount: jobData.TaxAmount,
+        taxAmount:
+          (jobData.TaxAmount || 0) +
+          (jobData.SGSTAmount || 0) +
+          (jobData.CGSTAmount || 0) +
+          (jobData.IGSTAmount || 0),
         metal: jobData.metal,
         diamoond: jobData.diamoond,
         colorStone: jobData.colorStone,
@@ -404,7 +408,7 @@ const Scanner = () => {
             </span>
             <span style={{ fontSize: "15px" }}>{activeDetail.Category}</span>
           </div>
-          <p className="singleCard_priceView">₹{activeDetail.AmountWithtax}</p>
+          <p className="singleCard_priceView">Amt{activeDetail.AmountWithtax}</p>
         </div>
         <div style={{ display: "flex", padding: "5px 0px 0px 0px" }}>
           <div style={{ width: "35%" }}>
@@ -434,7 +438,7 @@ const Scanner = () => {
                   }}
                 >
                   {" "}
-                  ₹{activeDetail.discountedPrice}
+                  Amt{activeDetail.discountedPrice}
                 </p>
               </div>
             )}
@@ -618,37 +622,37 @@ const Scanner = () => {
               <div className="price_breack_div">
                 <p className="price_breack_div_titles">Metal (incl. finding)</p>
                 <p className="price_breack_div_values">
-                  ₹ {priceBreackUpAllValues?.TotalMetalCost}
+                  Amt {priceBreackUpAllValues?.TotalMetalCost}
                 </p>
               </div>
               <div className="price_breack_div">
                 <p className="price_breack_div_titles">Diamond</p>
                 <p className="price_breack_div_values">
-                  ₹ {priceBreackUpAllValues?.TotalDiamondWtPrice}
+                  Amt {priceBreackUpAllValues?.TotalDiamondWtPrice}
                 </p>
               </div>
               <div className="price_breack_div">
                 <p className="price_breack_div_titles">Color Stone</p>
                 <p className="price_breack_div_values">
-                  ₹ {priceBreackUpAllValues?.TotalColosrStoneWtPrice}
+                  Amt {priceBreackUpAllValues?.TotalColosrStoneWtPrice}
                 </p>
               </div>
               <div className="price_breack_div">
                 <p className="price_breack_div_titles">Misc</p>
                 <p className="price_breack_div_values">
-                  ₹ {priceBreackUpAllValues?.TotalMiscWtPrice}
+                  Amt {priceBreackUpAllValues?.TotalMiscWtPrice}
                 </p>
               </div>
               <div className="price_breack_div">
                 <p className="price_breack_div_titles">Making Charges</p>
                 <p className="price_breack_div_values">
-                  ₹ {priceBreackUpAllValues?.TotalMakingWtPrice}
+                  Amt {priceBreackUpAllValues?.TotalMakingWtPrice}
                 </p>
               </div>
               <div className="price_breack_div">
                 <p className="price_breack_div_titles">Tax Amount</p>
                 <p className="price_breack_div_values">
-                  ₹ {priceBreackUpAllValues?.taxAmount}
+                  Amt {Number(priceBreackUpAllValues?.taxAmount || 0).toFixed(2)}
                 </p>
               </div>
 
@@ -658,13 +662,15 @@ const Scanner = () => {
               >
                 <p className="price_breack_div_titles_total">Total</p>
                 <p className="price_breack_div_values_total">
-                  ₹{" "}
-                  {priceBreackUpAllValues?.TotalMetalCost +
-                    priceBreackUpAllValues?.TotalDiamondWtPrice +
-                    priceBreackUpAllValues?.TotalColosrStoneWtPrice +
-                    priceBreackUpAllValues?.TotalMiscWtPrice +
-                    priceBreackUpAllValues?.TotalMakingWtPrice +
-                    priceBreackUpAllValues?.taxAmount}
+                  Amt{" "}
+                  {Number(
+                    (priceBreackUpAllValues?.TotalMetalCost || 0) +
+                    (priceBreackUpAllValues?.TotalDiamondWtPrice || 0) +
+                    (priceBreackUpAllValues?.TotalColosrStoneWtPrice || 0) +
+                    (priceBreackUpAllValues?.TotalMiscWtPrice || 0) +
+                    (priceBreackUpAllValues?.TotalMakingWtPrice || 0) +
+                    (priceBreackUpAllValues?.taxAmount || 0)
+                  ).toFixed(2)}
                 </p>
               </div>
             </div>
@@ -766,7 +772,7 @@ const Scanner = () => {
                           </span>
 
                           <p className="singleCard_priceView">
-                            ₹ {data.AmountWithtax}
+                            Amt {data.AmountWithtax}
                           </p>
                         </div>
                         <div
@@ -854,7 +860,7 @@ const Scanner = () => {
                                     }}
                                   >
                                     {" "}
-                                    ₹{data.discountedPrice}
+                                    Amt {data.discountedPrice}
                                   </p>
                                 </div>
                               )}

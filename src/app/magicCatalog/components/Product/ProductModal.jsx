@@ -1,0 +1,838 @@
+'use client';
+
+import React, { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCart } from '@mc/context/CartContext';
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+    Typography,
+    Grid,
+    CardMedia,
+    Box,
+    IconButton,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Collapse,
+    Slide,
+    Skeleton
+} from '@mui/material';
+import { alpha, useTheme } from '@mui/material/styles';
+
+import {
+    ShoppingCart,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    ChevronDown,
+    ChevronUp,
+    ScanSearch,
+    Trash2,
+    Maximize,
+    Minimize,
+    Copy,
+    Check,
+    Newspaper,
+    ExternalLink,
+} from 'lucide-react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Keyboard, Mousewheel, Navigation, Virtual } from 'swiper/modules';
+import { motion, AnimatePresence } from 'framer-motion';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import ReusableConfirmModal from '../Common/modals/ReusableConfirmModal';
+import { toast } from 'react-hot-toast';
+import { assetPath } from '@mc/utils/paths';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
+
+const SOURCE_META = {
+    design: { label: 'Design', color: '#7367f0' },
+    stock: { label: 'Stock', color: '#0f9d77' },
+    article: { label: 'Article', color: '#e8830c' },
+};
+
+
+const ProductModalImage = ({ src, alt }) => {
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    return (
+        <Box sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {!isLoaded && (
+                <Skeleton
+                    variant="rectangular"
+                    animation="wave"
+                    sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        bgcolor: 'rgba(0,0,0,0.05)'
+                    }}
+                />
+            )}
+            <CardMedia
+                component="img"
+                image={src}
+                alt={alt}
+                loading="lazy"
+                onLoad={() => setIsLoaded(true)}
+                sx={{
+                    objectFit: 'contain',
+                    borderRadius: 0,
+                    width: '100%',
+                    height: '100%',
+                    opacity: isLoaded ? 1 : 0,
+                    transition: 'opacity 0.3s ease-in-out'
+                }}
+            />
+        </Box>
+    );
+};
+
+
+export default function ProductModal({ open, onClose, product, products = [], startIndex = 0, onAddToCart, onSearchSimilar, onShowArticles, showSimilarButton = true, fromCart, urlParamsFlag }) {
+    const theme = useTheme()
+    const router = useRouter();
+    const [activeIndex, setActiveIndex] = useState(startIndex);
+    const { isItemInCart, removeFromCart } = useCart();
+    const [openConfirmModal, setOpenConfirmModal] = useState(false);
+    const [swiperRef, setSwiperRef] = useState(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [showAllDetails, setShowAllDetails] = useState(false);
+
+    // for hide diamond, colorstone information
+    const [showMore, setShowMore] = useState(false);
+    const [copiedId, setCopiedId] = useState(null);
+
+    const isPDFlag = typeof window !== 'undefined' && sessionStorage.getItem("urlParams")?.includes('pd');
+
+    const formatWeight = (value) => {
+        const n = typeof value === 'number' ? value : Number(value);
+        if (!Number.isFinite(n)) return '0.000';
+        return n.toFixed(3);
+    };
+
+    const softPrimaryButtonSx = {
+        textTransform: 'none',
+        boxShadow: 'none',
+        borderRadius: 2,
+        borderColor: 'transparent',
+        bgcolor: 'rgba(115, 103, 240, 0.08)',
+        color: 'primary.dark',
+        '&:hover': {
+            bgcolor: 'rgba(115, 103, 240, 0.12)',
+            borderColor: 'transparent',
+            boxShadow: 'none',
+        },
+    };
+
+    const softDangerButtonSx = {
+        textTransform: 'none',
+        boxShadow: 'none',
+        borderRadius: 2,
+        borderColor: 'transparent',
+        bgcolor: 'rgba(244, 67, 54, 0.08)',
+        color: 'error.dark',
+        '&:hover': {
+            bgcolor: 'rgba(244, 67, 54, 0.12)',
+            borderColor: 'transparent',
+            boxShadow: 'none',
+        },
+    };
+
+    const sliderButton = {
+        width: 36,
+        height: 36,
+        borderRadius: '50%',
+        backgroundColor: alpha(theme.palette.secondary?.extraLight || theme.palette.secondary.light, 0.1),
+        color: 'secondary.dark',
+        '&:hover': {
+            bgcolor: 'secondary.extraLight',
+            borderColor: 'transparent',
+            boxShadow: 'none',
+        },
+    }
+
+    // When modal opens, ensure slider starts from the provided startIndex
+    useEffect(() => {
+        if (open) {
+            setActiveIndex(startIndex);
+            if (swiperRef) {
+                swiperRef.slideTo(startIndex, 0);
+            }
+        }
+    }, [open, startIndex, swiperRef]);
+
+    const sliderProducts = useMemo(() => (
+        products.length > 0 ? products.slice(0, 200) : [product]
+    ), [products, product]);
+
+    if (!product) return null;
+
+    const handleSlideChange = (swiper) => {
+        setActiveIndex(swiper.activeIndex);
+    };
+
+    const handleRemoveItem = () => {
+        setOpenConfirmModal(true);
+    };
+
+    const handleConfirmRemove = () => {
+        const currentProduct = sliderProducts[activeIndex] || product;
+        if (currentProduct) {
+            removeFromCart(currentProduct.id);
+        }
+        setOpenConfirmModal(false);
+    };
+
+    const handleCopyDesign = async (designNo) => {
+        if (!designNo) return;
+
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(designNo);
+            } else {
+                throw new Error('Clipboard API unavailable');
+            }
+        } catch {
+            const textarea = document.createElement('textarea');
+            textarea.value = designNo;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+            } catch (e) {
+                console.error('Clipboard fallback failed:', e);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        setCopiedId(designNo);
+        setTimeout(() => setCopiedId(null), 2000);
+
+        toast.success(`Copied: ${designNo}`, {
+            style: {
+                borderRadius: '10px',
+                background: '#333',
+                color: '#fff',
+                fontSize: '0.875rem'
+            },
+            iconTheme: {
+                primary: '#7367f0',
+                secondary: '#fff',
+            },
+        });
+    };
+
+    const currentProd = sliderProducts[activeIndex] || product;
+
+    // Jump back to the product page in this item's catalog, pre-searched
+    const handleOpenInCatalog = () => {
+        const prod = currentProd;
+        if (!prod) return;
+        try {
+            sessionStorage.setItem('productListRestoreState', JSON.stringify({
+                catalogView: prod.source || 'design',
+                searchTerm: prod.designno || '',
+                appliedFilters: [],
+                searchResults: null,
+                timestamp: Date.now(),
+            }));
+        } catch (e) { }
+        onClose();
+        router.push('/magicCatalog/product');
+    };
+
+    return (
+        <Dialog
+            open={open}
+            {...(!isPDFlag && { TransitionComponent: Transition })}
+            onClose={onClose}
+            maxWidth={isFullscreen ? false : "lg"}
+            fullWidth
+            disableScrollLock
+            fullScreen={isFullscreen}
+            PaperProps={{
+                sx: {
+                    height: isFullscreen ? '100%' : 'calc(90vh)',
+                    maxHeight: isFullscreen ? '100%' : 'calc(90vh)',
+                    borderRadius: isFullscreen ? 0 : 3,
+                    pb: isFullscreen ? '50px' : 0,
+                    m: isFullscreen ? 0 : 2
+                }
+            }}
+            sx={{
+                '& .MuiDialog-container': {
+                    height: isFullscreen ? '100%' : '94%',
+                    maxHeight: isFullscreen ? '100%' : '94%'
+                }
+            }}
+        >
+            <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                    <Typography component="span" variant="subtitle1" fontWeight="bold" sx={{ fontSize: '1.25rem' }}>
+                        Product Details
+                    </Typography>
+                    {currentProd?.source && SOURCE_META[currentProd.source] && (
+                        <Box
+                            sx={{
+                                bgcolor: `${SOURCE_META[currentProd.source].color}14`,
+                                color: SOURCE_META[currentProd.source].color,
+                                px: 0.9,
+                                py: 0.15,
+                                borderRadius: 10,
+                                fontSize: '0.6rem',
+                                fontWeight: 600,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.4px',
+                                lineHeight: 1.5,
+                            }}
+                        >
+                            {SOURCE_META[currentProd.source].label}
+                        </Box>
+                    )}
+                </Box>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <IconButton
+                        onClick={handleOpenInCatalog}
+                        size="small"
+                        title="Open in catalog"
+                        sx={{ color: theme => theme.palette.grey[500], padding: 1 }}
+                    >
+                        <ExternalLink size={18} />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => setIsFullscreen(!isFullscreen)}
+                        size="small"
+                        sx={{ color: theme => theme.palette.grey[500], padding: 1 }}
+                    >
+                        {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+                    </IconButton>
+                    <IconButton onClick={onClose} sx={{ color: theme => theme.palette.grey[500], padding: 1 }}>
+                        <X size={20} />
+                    </IconButton>
+                </Box>
+            </DialogTitle>
+
+            <DialogContent sx={{ p: 0, overflow: 'hidden' }}>
+                <Swiper
+                    modules={[Virtual, Keyboard, Mousewheel]}
+                    onSwiper={setSwiperRef}
+                    spaceBetween={0}
+                    slidesPerView={1}
+                    keyboard={{ enabled: true }}
+                    mousewheel={{ enabled: true }}
+                    virtual={{ enabled: true }}
+                    initialSlide={startIndex}
+                    onSlideChange={handleSlideChange}
+                    style={{ width: '100%', height: '100%' }}
+                >
+                    {sliderProducts.map((prod, index) => {
+                        // Only mount slide content near the active slide — mounting all
+                        // slides at once blocks the click handler for ~1s on large lists.
+                        const isNearActive = Math.abs(index - activeIndex) <= 2;
+                        // Recalculate conditional flags per product
+                        const pDiamonds = (prod.diamondpcs > 0) || (prod.diamondweight > 0);
+                        const pStones = (prod.stonepcs > 0) || (prod.stoneweight > 0);
+
+                        return (
+                            <SwiperSlide key={`${prod.id || 'product'}-${index}`} virtualIndex={index}>
+                                {isNearActive && (
+                                <Grid container sx={{ height: '100%' }}>
+                                    {/* Image Section - Priority (Cover + No Shadow) */}
+                                    <Grid size={{ xs: 12, md: isFullscreen ? 9.5 : 8 }} sx={{ height: { xs: '50%', md: '100%' } }}>
+                                        <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <ProductModalImage
+                                                src={prod.originalUrl || prod.image || prod.thumbUrl || assetPath("/images/image-not-found.jpg")}
+                                                alt={prod.categoryname || 'Product image'}
+                                            />
+                                        </Box>
+                                    </Grid>
+
+                                    {/* Details Section - REFINED & CONDITIONAL */}
+                                    <Grid size={{ xs: 12, md: isFullscreen ? 2.5 : 4 }} sx={{ height: { xs: '50%', md: '100%' }, overflowY: 'auto', bgcolor: 'background.paper', borderLeft: '1px solid', borderColor: 'divider' }}>
+                                        <Box sx={{ p: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+
+                                            {/* Design Number */}
+                                            <Box sx={{ pb: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5, gap: 1 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Typography variant="h5" fontWeight="600" color="#2c2c2c" sx={{ wordBreak: 'break-all' }}>
+                                                            {prod.designno || "N/A"}
+                                                        </Typography>
+                                                        {prod.designno && (
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => handleCopyDesign(prod.designno)}
+                                                                sx={{
+                                                                    color: copiedId === prod.designno ? 'success.main' : 'primary.main',
+                                                                    bgcolor: copiedId === prod.designno ? alpha(theme.palette.success.main, 0.08) : alpha(theme.palette.primary.main, 0.05),
+                                                                    p: 0.6,
+                                                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                                    '&:hover': {
+                                                                        bgcolor: copiedId === prod.designno ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.primary.main, 0.1),
+                                                                        transform: 'scale(1.05)'
+                                                                    },
+                                                                    '&:active': {
+                                                                        transform: 'scale(0.95)'
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <AnimatePresence mode="wait">
+                                                                    <motion.div
+                                                                        key={copiedId === prod.designno ? 'check' : 'copy'}
+                                                                        initial={{ scale: 0.5, opacity: 0, rotate: -45 }}
+                                                                        animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                                                                        exit={{ scale: 0.5, opacity: 0, rotate: 45 }}
+                                                                        transition={{ duration: 0.15 }}
+                                                                        style={{ display: 'flex' }}
+                                                                    >
+                                                                        {copiedId === prod.designno ? <Check size={14} /> : <Copy size={14} />}
+                                                                    </motion.div>
+                                                                </AnimatePresence>
+                                                            </IconButton>
+                                                        )}
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexShrink: 0 }}>
+                                                        {prod.brandname && (
+                                                            <Typography
+                                                                variant="body2"
+                                                                fontWeight="700"
+                                                                color="primary.main"
+                                                                sx={{
+                                                                    textAlign: 'right',
+                                                                    whiteSpace: 'nowrap',
+                                                                    bgcolor: 'rgba(115, 103, 240, 0.1)',
+                                                                    px: 1.2,
+                                                                    py: 0.4,
+                                                                    borderRadius: 1.5,
+                                                                    fontSize: '0.85rem'
+                                                                }}
+                                                            >
+                                                                {prod.brandname}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                </Box>
+                                                {prod.StockBarcode && (
+                                                    <Typography
+                                                        variant="body2"
+                                                        component="div"
+                                                        sx={{
+                                                            mt: 0.5,
+                                                            color: 'text.secondary',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 0.5,
+                                                            fontSize: '0.85rem'
+                                                        }}
+                                                    >
+                                                        Barcode:
+                                                        <Box component="span" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                            {prod.StockBarcode}
+                                                        </Box>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleCopyDesign(prod.StockBarcode)}
+                                                            sx={{
+                                                                color: copiedId === prod.StockBarcode ? 'success.main' : 'primary.main',
+                                                                p: 0.4,
+                                                                transition: 'all 0.2s',
+                                                                '&:hover': { transform: 'scale(1.05)' }
+                                                            }}
+                                                        >
+                                                            {copiedId === prod.StockBarcode ? <Check size={13} /> : <Copy size={13} />}
+                                                        </IconButton>
+                                                    </Typography>
+                                                )}
+                                                <Typography
+                                                    className="dt_titleline"
+                                                    variant="body2"
+                                                    component="div"
+                                                    sx={{
+                                                        mt: 0.75,
+                                                        color: 'text.secondary',
+                                                        display: 'flex',
+                                                        flexWrap: 'wrap',
+                                                        alignItems: 'center',
+                                                        lineHeight: 1.6,
+                                                        wordBreak: 'break-word'
+                                                    }}
+                                                >
+                                                    {[{ value: prod.collectionname }, { value: prod.categoryname }, { value: prod.subcategoryname }].filter(p => Boolean(p.value)).map((part, idx, arr) => (
+                                                        <Box key={`${part.value}-${idx}`} component="span">
+                                                            <Box component="span" sx={part.isBrand ? { color: 'text.primary', fontWeight: 700 } : undefined}>
+                                                                {part.value}
+                                                            </Box>
+                                                            {idx < arr.length - 1 ? <Box component="span" sx={{ mx: 0.5 }}>/</Box> : null}
+                                                        </Box>
+                                                    ))}
+                                                </Typography>
+                                                <Typography
+                                                    className="dt_subtitleline"
+                                                    variant="body2"
+                                                    component="div"
+                                                    sx={{
+                                                        mt: 0.25,
+                                                        color: 'text.disabled',
+                                                        display: 'flex',
+                                                        flexWrap: 'wrap',
+                                                        alignItems: 'center',
+                                                        lineHeight: 1.4,
+                                                        wordBreak: 'break-word',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    {[{ value: prod.gendername }, { value: prod.occasionname }, { value: prod.stylename }].filter(p => Boolean(p.value)).map((part, idx, arr) => (
+                                                        <Box key={`${part.value}-${idx}`} component="span">
+                                                            <Box component="span">
+                                                                {part.value}
+                                                            </Box>
+                                                            {idx < arr.length - 1 ? <Box component="span" sx={{ mx: 0.5 }}>/</Box> : null}
+                                                        </Box>
+                                                    ))}
+                                                </Typography>
+
+                                                <Box sx={{ mt: 1.5, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 1 }}>
+                                                    {(prod.metaltype || prod.metalpurity || prod.metalcolor) && (
+                                                        <Typography
+                                                            variant="body2"
+                                                            fontWeight={600}
+                                                            color="secondary.main"
+                                                            sx={{
+                                                                bgcolor: 'rgba(115, 103, 240, 0.08)',
+                                                                px: 1.2,
+                                                                py: 0.5,
+                                                                borderRadius: 2,
+                                                                lineHeight: 1.2,
+                                                                width: 'fit-content'
+                                                            }}
+                                                        >
+                                                            {[prod.metaltype, prod.metalpurity, prod.metalcolor].filter(Boolean).join(' ')}
+                                                        </Typography>
+                                                    )}
+                                                    {prod.producttype && (
+                                                        <Typography
+                                                            variant="body2"
+                                                            fontWeight={600}
+                                                            color="secondary.main"
+                                                            sx={{
+                                                                bgcolor: 'rgba(115, 103, 240, 0.08)',
+                                                                px: 1.2,
+                                                                py: 0.5,
+                                                                borderRadius: 2,
+                                                                lineHeight: 1.2,
+                                                                width: 'fit-content',
+                                                                textTransform: 'uppercase',
+                                                                fontSize: '0.75rem',
+                                                                letterSpacing: '0.5px'
+                                                            }}
+                                                        >
+                                                            {prod.producttype}
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            </Box>
+
+                                            {/* Weights */}
+                                            <Box>
+                                                <Grid container spacing={2}>
+                                                    {prod.MetalWeight > 0 && (
+                                                        <Grid size={{ xs: 6 }}>
+                                                            <Box>
+                                                                <Typography variant="caption" display="block" color="text.disabled">Net Weight(Gms)</Typography>
+                                                                <Typography variant="body1" fontWeight={600} sx={{ fontSize: '1.3rem' }}>{formatWeight(prod.MetalWeight)}</Typography>
+                                                            </Box>
+                                                        </Grid>
+                                                    )}
+                                                    {prod.ActualGrossweight > 0 && (
+                                                        <Grid size={{ xs: 6 }}>
+                                                            <Box>
+                                                                <Typography variant="caption" display="block" color="text.disabled">Gross Weight(Gms)</Typography>
+                                                                <Typography variant="body1" fontWeight={600} sx={{ fontSize: '1.3rem' }}>{formatWeight(prod.ActualGrossweight)}</Typography>
+                                                            </Box>
+                                                        </Grid>
+                                                    )}
+                                                </Grid>
+                                            </Box>
+
+                                            {/* View More Toggle */}
+                                            {showMore && (pDiamonds || pStones) && (
+                                                <Box sx={{ textAlign: 'end' }}>
+                                                    <Button
+                                                        variant="text"
+                                                        onClick={() => setShowAllDetails(!showAllDetails)}
+                                                        endIcon={showAllDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                                        sx={{
+                                                            padding: '0.5rem',
+                                                            '&:hover': {
+                                                            },
+                                                        }}
+                                                    >
+                                                        {showAllDetails ? "Show Less" : "Show More"}
+                                                    </Button>
+                                                </Box>
+                                            )}
+
+                                            {/* Specifications (Conditional) */}
+                                            <Collapse in={showAllDetails} unmountOnExit>
+                                                <Box sx={{ mt: 1 }}>
+                                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                        {pDiamonds && (
+                                                            <Box sx={{ border: '1px solid', borderColor: alpha(theme.palette.divider, 0.6), borderRadius: 2, overflow: 'hidden' }}>
+                                                                <Box
+                                                                    sx={{
+                                                                        px: 1.25,
+                                                                        py: 0.9,
+                                                                        display: 'flex',
+                                                                        justifyContent: 'space-between',
+                                                                        alignItems: 'center',
+                                                                        bgcolor: alpha(theme.palette.primary.main, 0.06),
+                                                                        borderBottom: '1px solid',
+                                                                        borderColor: alpha(theme.palette.divider, 0.6),
+                                                                    }}
+                                                                >
+                                                                    <Typography variant="body2" fontWeight={700} sx={{ color: 'text.primary' }}>
+                                                                        Diamond
+                                                                    </Typography>
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary', textAlign: 'right' }}>
+                                                                        {[
+                                                                            prod.diamondpcs ? `${prod.diamondpcs} pcs` : null,
+                                                                            prod.diamondweight ? `${formatWeight(prod.diamondweight)} ct` : null,
+                                                                        ].filter(Boolean).join(' • ') || ''}
+                                                                    </Typography>
+                                                                </Box>
+                                                                <TableContainer sx={{ bgcolor: 'background.paper' }}>
+                                                                    <Table
+                                                                        size="small"
+                                                                        sx={{
+                                                                            '& .MuiTableCell-root': { py: 0.8, px: 1.1 },
+                                                                            '& th': { color: 'text.secondary', fontWeight: 400, bgcolor: alpha(theme.palette.text.primary, 0.03) },
+                                                                            '& td': { borderBottom: '1px solid rgba(0,0,0,0.06)' },
+                                                                            '& tbody tr:last-child td': { borderBottom: 0 },
+                                                                        }}
+                                                                    >
+                                                                        <TableHead>
+                                                                            <TableRow>
+                                                                                <TableCell>Shape</TableCell>
+                                                                                <TableCell>Clarity</TableCell>
+                                                                                <TableCell>Color</TableCell>
+                                                                                <TableCell>Size</TableCell>
+                                                                                <TableCell align="right">Pcs</TableCell>
+                                                                            </TableRow>
+                                                                        </TableHead>
+                                                                        <TableBody>
+                                                                            <TableRow sx={{ '& td': { color: 'text.primary', fontWeight: 600 } }}>
+                                                                                <TableCell>{prod.diamondshape || '-'}</TableCell>
+                                                                                <TableCell>{prod.diamondclarity || prod.clarity || '-'}</TableCell>
+                                                                                <TableCell>{prod.diamondcolor || prod.color || '-'}</TableCell>
+                                                                                <TableCell>
+                                                                                    {prod.diamondsize || (prod.diamondweight ? `${formatWeight(prod.diamondweight)} ct` : '-')}
+                                                                                </TableCell>
+                                                                                <TableCell align="right">{prod.diamondpcs || 0}</TableCell>
+                                                                            </TableRow>
+                                                                        </TableBody>
+                                                                    </Table>
+                                                                </TableContainer>
+                                                            </Box>
+                                                        )}
+
+                                                        {pStones && (
+                                                            <Box sx={{ border: '1px solid', borderColor: alpha(theme.palette.divider, 0.6), borderRadius: 2, overflow: 'hidden' }}>
+                                                                <Box
+                                                                    sx={{
+                                                                        px: 1.25,
+                                                                        py: 0.9,
+                                                                        display: 'flex',
+                                                                        justifyContent: 'space-between',
+                                                                        alignItems: 'center',
+                                                                        bgcolor: alpha(theme.palette.secondary.main, 0.06),
+                                                                        borderBottom: '1px solid',
+                                                                        borderColor: alpha(theme.palette.divider, 0.6),
+                                                                    }}
+                                                                >
+                                                                    <Typography variant="body2" fontWeight={700} sx={{ color: 'text.primary' }}>
+                                                                        Colorstone
+                                                                    </Typography>
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary', textAlign: 'right' }}>
+                                                                        {[
+                                                                            prod.stonepcs ? `${prod.stonepcs} pcs` : null,
+                                                                            prod.stoneweight ? `${formatWeight(prod.stoneweight)} ct` : null,
+                                                                        ].filter(Boolean).join(' • ') || ''}
+                                                                    </Typography>
+                                                                </Box>
+                                                                <TableContainer sx={{ bgcolor: 'background.paper' }}>
+                                                                    <Table
+                                                                        size="small"
+                                                                        sx={{
+                                                                            '& .MuiTableCell-root': { py: 0.8, px: 1.1 },
+                                                                            '& th': { color: 'text.secondary', fontWeight: 700, bgcolor: alpha(theme.palette.text.primary, 0.03) },
+                                                                            '& td': { borderBottom: '1px solid rgba(0,0,0,0.06)' },
+                                                                            '& tbody tr:last-child td': { borderBottom: 0 },
+                                                                        }}
+                                                                    >
+                                                                        <TableHead>
+                                                                            <TableRow>
+                                                                                <TableCell>Shape</TableCell>
+                                                                                <TableCell>Clarity</TableCell>
+                                                                                <TableCell>Color</TableCell>
+                                                                                <TableCell>Size</TableCell>
+                                                                                <TableCell align="right">Pcs</TableCell>
+                                                                            </TableRow>
+                                                                        </TableHead>
+                                                                        <TableBody>
+                                                                            <TableRow sx={{ '& td': { color: 'secondary.main', fontWeight: 600 } }}>
+                                                                                <TableCell>{prod.stoneshape || prod.stoneshapename || '-'}</TableCell>
+                                                                                <TableCell>{prod.stoneclarity || '-'}</TableCell>
+                                                                                <TableCell>{prod.stonecolor || '-'}</TableCell>
+                                                                                <TableCell>
+                                                                                    {prod.stonesize || (prod.stoneweight ? `${formatWeight(prod.stoneweight)} ct` : '-')}
+                                                                                </TableCell>
+                                                                                <TableCell align="right">{prod.stonepcs || 0}</TableCell>
+                                                                            </TableRow>
+                                                                        </TableBody>
+                                                                    </Table>
+                                                                </TableContainer>
+                                                            </Box>
+                                                        )}
+                                                    </Box>
+                                                </Box>
+                                            </Collapse>
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                                )}
+                            </SwiperSlide>
+                        );
+                    })}
+                </Swiper>
+            </DialogContent>
+
+            <DialogActions sx={{
+                p: { xs: 1, sm: 2 },
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                gap: { xs: 1, sm: 0 },
+                rowGap: 1,
+                backgroundColor: 'background.paper',
+                borderTop: '1px solid',
+                borderColor: 'divider'
+            }}>
+
+                {/* Left Area: Secondary Actions */}
+                <Box sx={{ display: 'flex', gap: 1, flex: { xs: '1 1 100%', sm: 1 }, order: { xs: 2, sm: 0 }, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
+                    {showSimilarButton && onSearchSimilar && (currentProd?.originalUrl || currentProd?.image || currentProd?.thumbUrl) && (
+                        <Button
+                            variant="outlined"
+                            startIcon={<ScanSearch size={18} />}
+                            onClick={() => {
+                                onSearchSimilar(currentProd);
+                                onClose();
+                            }}
+                            sx={softPrimaryButtonSx}
+                        >
+                            Search Similar
+                        </Button>
+                    )}
+                    {onShowArticles && currentProd && (currentProd.source === 'article' || Number(currentProd?.HasArticle ?? currentProd?.hasarticle ?? 0) === 1) && (
+                        <Button
+                            variant="outlined"
+                            startIcon={<Newspaper size={18} />}
+                            onClick={() => {
+                                onShowArticles(currentProd);
+                                onClose();
+                            }}
+                            sx={softPrimaryButtonSx}
+                        >
+                            Articles
+                        </Button>
+                    )}
+                </Box>
+
+                {/* Center Area: Navigation Controls */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, justifyContent: 'center' }}>
+                    <IconButton
+                        onClick={() => swiperRef?.slidePrev()}
+                        disabled={activeIndex === 0}
+                        sx={{
+                            ...sliderButton,
+                            opacity: activeIndex === 0 ? 0.5 : 1
+                        }}
+                    >
+                        <ChevronLeft size={24} />
+                    </IconButton>
+
+                    <Typography variant="body2" sx={{ fontWeight: 600, minWidth: '60px', textAlign: 'center', color: 'secondary.light' }}>
+                        {activeIndex + 1} / {sliderProducts.length}
+                    </Typography>
+
+                    <IconButton
+                        onClick={() => swiperRef?.slideNext()}
+                        disabled={activeIndex === sliderProducts.length - 1}
+                        sx={{
+                            ...sliderButton,
+                            opacity: activeIndex === sliderProducts.length - 1 ? 0.5 : 1
+                        }}
+                    >
+                        <ChevronRight size={24} />
+                    </IconButton>
+                </Box>
+
+                {/* Right Area: Primary Action */}
+                <Box sx={{ display: 'flex', gap: 2, flex: { xs: '1 1 100%', sm: 1 }, order: { xs: 3, sm: 0 }, justifyContent: { xs: 'center', sm: 'flex-end' } }}>
+                    <Button
+                        variant="contained"
+                        startIcon={isItemInCart(currentProd?.id) ? <Trash2 size={18} /> : <ShoppingCart size={18} />}
+                        onClick={() => {
+                            if (isItemInCart(currentProd?.id)) {
+                                handleRemoveItem();
+                            } else {
+                                onAddToCart(currentProd);
+                            }
+                        }}
+                        sx={{
+                            background: isItemInCart(currentProd?.id) ? theme.gradients?.secondary : theme.gradients?.primary,
+                            color: "white",
+                            fontSize: '0.875rem',
+                            fontWeight: 600,
+                            py: 1.25,
+                            borderRadius: 2,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                            textTransform: 'none',
+                            '&:hover': {
+                                background: isItemInCart(currentProd?.id) ? theme.gradients?.secondary : theme.gradients?.primary,
+                                boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+                                transform: 'translateY(-2px)',
+                            },
+                            transition: 'all 0.1s ease',
+                        }}
+                    >
+                        {isItemInCart(currentProd?.id) ? 'Remove from Cart' : 'Add to Cart'}
+                    </Button>
+                </Box>
+            </DialogActions>
+            <ReusableConfirmModal
+                open={openConfirmModal}
+                onClose={() => setOpenConfirmModal(false)}
+                onConfirm={handleConfirmRemove}
+                type="removeItem"
+            />
+        </Dialog >
+    );
+}

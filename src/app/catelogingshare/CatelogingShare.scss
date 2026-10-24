@@ -1,0 +1,128 @@
+@use "../../sass/_variables" as *;
+
+
+
+.dataListShow {
+  display: block !important;
+  z-index: 9;
+  box-shadow: 0px 4px 18px 0px rgba(47, 43, 61, 0.1);
+  padding: 0px;
+  background-color: white;
+  height: 245px;
+  overflow: auto;
+}
+
+
+.save-button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #00cfe8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0094a7;
+  }
+}
+
+.Customer_list_view_title{
+  margin: 0px;
+  width: 100%;
+  background-color: white;
+  font-weight: 600;
+  padding: 8px 0px;
+  margin-top: -5px;
+  z-index: 9;
+  border-bottom: 1px solid lightgray;
+}
+
+.selected-customers {
+  margin: 15px;
+  box-shadow: $primary;
+  padding: 10px;
+
+  h4 {
+    margin: 10px 0px 0px 0px;
+    color: $primary;
+    text-align: center;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      margin-bottom: 5px;
+      background-color: #f9f9f9;
+
+      .delete-button {
+        background-color: #ff4d4d;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #cc0000;
+        }
+      }
+    }
+  }
+}
+
+.optionDataList {
+  background-color: #ececec63 !important;
+  border: 1px solid #cccccc7d !important;
+  padding: 6px !important;
+  border-radius: 5px !important;
+  margin: 4px !important;
+  font-size: 11px !important;
+  color: black !important;
+  width: 98% !important;
+  display: flex !important;
+}
+
+.customer_Title {
+  font-size: 17px;
+  margin: 10px 0px 5px 15px;
+  font-weight: 600;
+}
+
+.catelog_search_div {
+  margin: 30px 15px 15px 15px;
+}
+
+.catelog_save_btn {
+  height: 35px;
+  width: 100px;
+  background-color: $primary !important;
+  color: white !important;
+  font-weight: 600;
+  margin-top: 10px !important;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.75rem;
+  margin: -7px 0px 3px 5px;
+}
+
+.newUser_main {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.catelog_submit_button {
+  background-color: $primary !important;
+  color: white !important;
+  font-weight: 500;
+}

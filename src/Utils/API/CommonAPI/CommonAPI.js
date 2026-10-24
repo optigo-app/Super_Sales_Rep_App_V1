@@ -20,8 +20,6 @@ export const CommonAPI = async (body) => {
     typeof window !== "undefined" ? window.location.search : ""
   );
 
-  
-
   const token_url  = queryParams.get("token");
   const SV_url     = queryParams.get("SV");
   const cookie_token = Cookies.get("token");
@@ -30,7 +28,7 @@ export const CommonAPI = async (body) => {
   const SV    = sessionStorage.getItem("SV")    ?? "";
 
   const finalToken = isLocal()
-    ? "S3M6VF5518X76WW2"
+    ? token
     : token || token_url || cookie_token || "";
 
   const finalSv = isLocal()

@@ -11,8 +11,6 @@ const ConnectionManager = () => {
   const setProductData = useSetRecoilState(soketProductData);
   useEffect(() => {
     const { address, SoPath, di } = config;
-
-    console.log("configconfigconfig", config);
     const details = {
       path: SoPath,
       transports: ["websocket"],

@@ -80,13 +80,13 @@ export default function ProfilePage() {
         }
     }, []);
 
-    const name = user?.UserName || user?.Name || user?.FLname || user?.EmployeeName || 'User';
+    const name = user?.firstname || user?.Name || user?.FLname || user?.EmployeeName || 'User';
     const email = user?.Email || user?.email1 || user?.EmailId || '';
     const phone = user?.MobileNo || user?.mobileno || user?.PhoneNo || '';
     const company = user?.CompanyCode || user?.Firmname || user?.Company || '';
     const role = user?.RoleName || user?.Designation || user?.UserType || '';
     const empCode = user?.customercode || user?.EmployeeCode || user?.UserId || '';
-    const initial = name.charAt(0).toUpperCase();
+    const initial = user?.ImagePath ?? name.charAt(0).toUpperCase();
 
     const handleLogout = () => {
         sessionStorage.clear();
@@ -94,7 +94,7 @@ export default function ProfilePage() {
     };
 
     return (
-        <Box sx={{ bgcolor: '#F5F3FF', minHeight: '100vh' }}>
+        <Box sx={{ bgcolor: 'white', minHeight: '100vh' }}>
             <Box
                 sx={{
                     display: 'flex',
@@ -102,7 +102,7 @@ export default function ProfilePage() {
                     gap: 1.5,
                     px: 2,
                     py: 1.5,
-                    bgcolor: '#F5F3FF',
+                    bgcolor: 'white',
                     borderBottom: '1px solid rgba(124,58,237,0.08)',
                     position: 'sticky',
                     top: 0,
@@ -149,9 +149,8 @@ export default function ProfilePage() {
                             border: '3px solid rgba(255,255,255,0.4)',
                             boxShadow: '0 4px 20px rgba(0,0,0,0.18)',
                         }}
-                    >
-                        {initial}
-                    </Avatar>
+                        src={initial}
+                    />
 
                     <Box sx={{ textAlign: 'center' }}>
                         <Typography sx={{ color: '#fff', fontSize: 20, fontWeight: 800, letterSpacing: '-0.3px' }}>
@@ -190,7 +189,7 @@ export default function ProfilePage() {
                             border: '1px solid rgba(124,58,237,0.06)',
                         }}
                     >
-                        <Box sx={{ px: 2, py: 1, bgcolor: '#F5F3FF' }}>
+                        <Box sx={{ px: 2, py: 1, bgcolor: 'white' }}>
                             <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#7C3AED', letterSpacing: '0.07em', textTransform: 'uppercase' }}>
                                 Contact Details
                             </Typography>

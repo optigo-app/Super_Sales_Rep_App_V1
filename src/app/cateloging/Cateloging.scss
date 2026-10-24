@@ -1,0 +1,279 @@
+@use "../../sass/_variables" as *;
+
+.cataloging_container {
+  padding: 0px 0px;
+  position: relative;
+  transition: all 0.3s ease;
+  background-color: #F8F7FF;
+  // height: 100vh;
+  // background-color: white;
+
+  .top-buttons {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    z-index: 10;
+
+    .tab-button {
+      padding: 10px 20px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      transition: background 0.3s;
+      border-radius: 5px;
+
+      &.active {
+        background-color: #9349d2;
+        color: white;
+      }
+    }
+
+    .share-button {
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      transition: background 0.3s;
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
+
+      svg {
+        color: #007bff;
+      }
+    }
+  }
+
+  .grid-container {
+    margin-top: 160px; // To ensure the grid doesn't overlap the top buttons
+    .MuiDataGrid-root {
+      border: none;
+    }
+
+    .MuiDataGrid-columnHeaders {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .MuiDataGrid-cell {
+      text-align: center;
+    }
+  }
+
+  &.full-screen {
+    .grid-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0;
+    }
+
+    .top-buttons {
+      display: none;
+    }
+  }
+
+  .data_cateloging {
+    background-color: white;
+
+    .MuiDataGrid-columnHeaderTitleContainerContent {
+      color: black !important;
+    }
+
+    .MuiDataGrid-menuIcon {
+      display: none !important;
+    }
+  }
+
+  .catelog_show_img {
+    max-width: 100px;
+  }
+
+  .catelog_detail_main__div {
+    padding-top: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 10px;
+
+    .catelog_deatil_div {
+      width: 100%;
+      box-shadow: 0px 4px 18px 0px rgba(47, 43, 61, 0.1);
+      background-color: white;
+    }
+
+    .cateloging_sub_div {
+      width: 100%;
+      display: flex;
+      gap: 20px;
+      justify-content: space-between;
+    }
+
+    .catelogin_Deatil_img {
+      width: 40px;
+    }
+
+    .catelog_Title_name {
+      font-size: 13px;
+      color: $primary;
+      display: flex;
+      margin: 0px;
+      font-family: $font-primary;
+      justify-content: flex-end;
+    }
+
+    .catelog_Timing {
+      font-size: 12px;
+      color: $primary;
+      display: flex;
+      margin: -7px 0px 0px 0px;
+      font-family: $font-primary;
+    }
+  }
+
+  .catelog_item_div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .ctelog_itemCount {
+    margin: 0px;
+    display: flex;
+    justify-content: flex-end;
+    color: $primary;
+    font-weight: 600;
+    font-size: 12px;
+  }
+}
+
+.share_option_main_div {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.Option_share_catelog {
+  height: 35px;
+  background-color: $primary !important;
+  color: white !important;
+  margin: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px !important;
+  border-radius: 5px;
+  padding-bottom: 5px;
+}
+
+.choose_textModel {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: $primary;
+  margin: 0px 0px 25px 0px;
+}
+
+.cateloging_share_icone {
+  color: $primary;
+}
+
+$mainColor: $primary; // Replace with your $mainColor variable
+$stickyBg: #f8f7fa;
+
+.catelog_searchbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-inline: 15px;
+  transition:
+    background-color 0.25s ease,
+    padding 0.25s ease,
+    margin 0.25s ease;
+
+  // ─── Full-width wrapper ───────────────────────────────────────────
+  .MuiFormControl-root,
+  .MuiInputBase-root {
+    width: 100% !important;
+  }
+
+  // ─── Outlined border: default ────────────────────────────────────
+  .Catelog_SearchBox {
+    .MuiOutlinedInput-root {
+      border-radius: 6px;
+
+      fieldset {
+        border: 1.5px solid $primary;
+        transition: border-color 0.2s ease;
+      }
+
+      &:hover fieldset {
+        border-color: darken($primary, 10%) !important;
+      }
+
+      &.Mui-focused fieldset {
+        border-color: $mainColor !important;
+        border-width: 2px;
+      }
+    }
+
+    // ─── Remove double-border from adornment side ─────────────────
+    .MuiInputBase-input.MuiInputBase-inputAdornedEnd:not(
+        .MuiAutocomplete-input
+      ) {
+      border-right: 0 !important;
+    }
+
+    // ─── Input padding ────────────────────────────────────────────
+    .MuiInputBase-input {
+      padding: 10px 12px;
+    }
+
+    // ─── Icons ───────────────────────────────────────────────────
+    .catelog_search_icon {
+      font-size: 18px;
+      color: $mainColor;
+    }
+
+    .catelog_searchClose_icone {
+      font-size: 16px;
+      color: #999;
+    }
+
+    .MuiIconButton-root {
+      color: #999;
+      padding: 4px;
+
+      &:hover {
+        color: darken(#999, 20%);
+        background-color: transparent;
+      }
+    }
+  }
+
+  // ─── Sticky state ────────────────────────────────────────────────
+  &.sticky {
+    position: sticky;
+    top: 0;
+    margin-top: 0;
+    margin-inline: 0 !important;
+    z-index: 99;
+    width: 100%;
+    padding: 8px 10px !important;
+
+    .Catelog_SearchBox {
+      .MuiOutlinedInput-root {
+        background-color: white;
+      }
+    }
+
+    .MuiInputBase-input::placeholder {
+      color: rgba(80, 80, 80, 0.65) !important;
+      opacity: 1;
+    }
+  }
+}

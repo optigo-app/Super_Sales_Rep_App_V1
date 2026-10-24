@@ -22,30 +22,9 @@ const statusColor = {
 };
 
 function ActionsTab({ customerId }) {
-  const router = useRouter();
-  const actions = [
-    { label: 'Create New Order', path: `/orders/new?customerId=${customerId}` },
-    { label: 'Record Payment', path: `/payments/new?customerId=${customerId}` },
-    { label: 'Add Note', path: `/notes/new?customerId=${customerId}` },
-    { label: 'Share Profile', path: null },
-  ];
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-      {actions.map((action) => (
-        <Box
-          key={action.label}
-          onClick={() => action.path && router.push(action.path)}
-          sx={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            p: 1.5, borderRadius: 2, bgcolor: '#F5F3FF', cursor: 'pointer',
-            WebkitTapHighlightColor: 'transparent',
-            '&:active': { bgcolor: '#EDE9FE' }, transition: 'background 0.15s',
-          }}
-        >
-          <Typography sx={{ fontSize: 14, fontWeight: 600, color: '#1F2937' }}>{action.label}</Typography>
-          <ChevronRight size={16} color="#9CA3AF" />
-        </Box>
-      ))}
+      <p>No Data </p>
     </Box>
   );
 }
@@ -57,8 +36,6 @@ export default function CustomerProfilePage() {
 
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [isLoading, setIsLoading] = useState(false);
-
-  // ── Customer info from list page (passed via sessionStorage) ──
   const [customerInfo, setCustomerInfo] = useState(null);
 
   // ── API data ──
@@ -100,12 +77,9 @@ export default function CustomerProfilePage() {
   const sc = statusColor[displayStatus] ?? statusColor.active;
 
   return (
-    <Box sx={{ bgcolor: '#F5F3FF', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: 'white', minHeight: '100vh' }}>
       <LoadingBackdrop isLoading={isLoading} />
-      <Header />
-
       <Box sx={{ px: 2, pt: 1.5, pb: '80px' }}>
-
         {/* Back */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
           <Box
@@ -169,7 +143,7 @@ export default function CustomerProfilePage() {
                   bgcolor: '#fff', borderRadius: 2, py: 1.25,
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5,
                   cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-                  '&:active': { transform: 'scale(0.94)', bgcolor: '#F5F3FF' }, transition: 'all 0.15s',
+                  '&:active': { transform: 'scale(0.94)', bgcolor: 'white' }, transition: 'all 0.15s',
                 }}
               >
                 <Icon size={18} color={color} strokeWidth={2.2} />
@@ -184,61 +158,6 @@ export default function CustomerProfilePage() {
             <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>{displayEmail}</Typography>
           </Box>
         </Box>
-
-        {/* ── Last 3 Orders ── */}
-        {lastOrderData.length > 0 && (
-          <Box sx={{ bgcolor: '#fff', borderRadius: 3, p: 2, mb: 1.5, boxShadow: '0 1px 6px rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.06)' }}>
-            <Typography sx={{ fontSize: 14, fontWeight: 700, color: '#1F2937', mb: 1.2 }}>Last 3 Orders</Typography>
-            {lastOrderData.map((order, i) => (
-              <Box
-                key={i}
-                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1, borderBottom: i < lastOrderData.length - 1 ? '1px solid #F3F4F6' : 'none' }}
-              >
-                <Box>
-                  <Typography sx={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>
-                    {order.OrderNo || order.JobNo || `Order #${i + 1}`}
-                  </Typography>
-                  <Typography sx={{ fontSize: 11, color: '#9CA3AF' }}>
-                    {order.OrderDate || order.Date || ''}
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'right' }}>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#7C3AED' }}>
-                    ₹{order.Amount || order.TotalAmount || 0}
-                  </Typography>
-                  {order.Status && (
-                    <Typography sx={{ fontSize: 11, color: '#6B7280' }}>{order.Status}</Typography>
-                  )}
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        )}
-
-        {/* ── Last 3 Payments ── */}
-        {paymentData.length > 0 && (
-          <Box sx={{ bgcolor: '#fff', borderRadius: 3, p: 2, mb: 1.5, boxShadow: '0 1px 6px rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.06)' }}>
-            <Typography sx={{ fontSize: 14, fontWeight: 700, color: '#1F2937', mb: 1.2 }}>Last 3 Payments</Typography>
-            {paymentData.map((pay, i) => (
-              <Box
-                key={i}
-                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1, borderBottom: i < paymentData.length - 1 ? '1px solid #F3F4F6' : 'none' }}
-              >
-                <Box>
-                  <Typography sx={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>
-                    {pay.PaymentMode || pay.Mode || 'Payment'}
-                  </Typography>
-                  <Typography sx={{ fontSize: 11, color: '#9CA3AF' }}>
-                    {pay.PaymentDate || pay.Date || ''}
-                  </Typography>
-                </Box>
-                <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#10B981' }}>
-                  ₹{pay.Amount || pay.PaidAmount || 0}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        )}
 
         {/* ── Tabs ── */}
         <Box sx={{ bgcolor: '#fff', borderRadius: 3, boxShadow: '0 1px 6px rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.06)', mb: 2 }}>
@@ -260,14 +179,13 @@ export default function CustomerProfilePage() {
             ))}
           </Box>
           <Box sx={{ p: 2 }}>
-            {activeTab === 'Dashboard' && <DashboardTab customerId={customerId} />}
-            {activeTab === 'Reports' && <ReportsTab customerId={customerId} />}
-            {activeTab === 'Actions' && <ActionsTab customerId={customerId} />}
+            {activeTab === 'Dashboard' && <DashboardTab customerId={customerId} customerInfo={customerInfo}/>}
+            {activeTab === 'Reports' && <ReportsTab customerId={customerId} customerInfo={customerInfo}/>}
+            {activeTab === 'Actions' && <ActionsTab customerId={customerId} customerInfo={customerInfo}/>}
           </Box>
         </Box>
 
       </Box>
-      <BottomNav />
     </Box>
   );
 }

@@ -2,14 +2,14 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { Box, Typography } from '@mui/material';
-import { Home, Users, Grid2X2, Tag } from 'lucide-react';
+import { Home, Users, Grid2X2, Tag, BookImage } from 'lucide-react';
 
 const navItems = [
-  { label: 'Home',       icon: Home,     path: '/home'       },
+  { label: 'Home',       icon: Home,     path: '/'       },
   { label: 'Customer',   icon: Users,    path: '/customer'   },
   { label: 'Tag Info',   icon: Grid2X2,    path: '/taginfo'   },
-  // { label: 'Collection', icon: Grid2X2,  path: '/collection' },
-  { label: 'MRP',        icon: Tag,      path: '/mrp'        },
+  { label: 'Catalog', icon: BookImage ,  path: '/cateloging' },
+  { label: 'MRPBill',    icon: Tag,      path: '/MRPBill'    },
 ];
 
 export default function BottomNav() {
@@ -25,7 +25,7 @@ export default function BottomNav() {
           bottom: 0,
           left: 0,
           right: 0,
-          height: 'calc(90px + env(safe-area-inset-bottom, 0px))',
+          height: '18px',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           background: 'linear-gradient(to top, rgba(245,243,255,0.92) 60%, rgba(245,243,255,0))',
@@ -38,7 +38,7 @@ export default function BottomNav() {
       <Box
         sx={{
           position: 'fixed',
-          bottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
+          bottom: '12px',
           left: '50%',
           transform: 'translateX(-50%)',
           width: '92%',
