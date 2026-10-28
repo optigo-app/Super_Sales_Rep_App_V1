@@ -1,4 +1,4 @@
-const defaultLocalHosts = "localhost,nzen,optigoai.web";
+const defaultLocalHosts = "localhost,nzen,optigoai.web,supersalesrep.web";
 
 const LOCAL_HOSTNAMES = (process.env.REACT_APP_LOCAL_HOSTNAMES || defaultLocalHosts)
     .split(',')
@@ -21,12 +21,10 @@ export const APIURL = isLocal ? DOMAINS.local : DOMAINS.live;
 
 const getAuthData = () => {
     if (!isBrowser) return null;
-
     try {
         const authData =
             sessionStorage.getItem("AuthqueryParams") ||
             localStorage.getItem("AuthqueryParams");
-
         return authData ? JSON.parse(authData) : null;
     } catch (error) {
         console.error("Error parsing AuthData:", error);

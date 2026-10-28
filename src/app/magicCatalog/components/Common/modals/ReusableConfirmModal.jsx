@@ -53,6 +53,22 @@ const ReusableConfirmModal = ({ open, onClose, onConfirm, type }) => {
             cancelText: "Cancel",
             confirmColor: "error",
             cancelColor: "inherit",
+        },
+        deleteAlbum: {
+            title: "Delete Album",
+            message: "Are you sure you want to delete this album? It will be moved to trash and can be restored later.",
+            confirmText: "Move to Trash",
+            cancelText: "Cancel",
+            confirmColor: "error",
+            cancelColor: "inherit",
+        },
+        hardDeleteAlbum: {
+            title: "Delete Forever",
+            message: "Are you sure you want to permanently delete this album? This action cannot be undone.",
+            confirmText: "Delete Forever",
+            cancelText: "Cancel",
+            confirmColor: "error",
+            cancelColor: "inherit",
         }
     };
 

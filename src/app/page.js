@@ -1,6 +1,8 @@
 // http://supersalesrep.web/V1/?token=0L8P5VSN38J59LXA&SV=0&SV=0&SpVer=V1&AppVer=1.0.0
 // http://localhost:6008/V1/?token=250NISIKUN3J2610&SV=0&version=R50B3&SV=0&SpVer=V1&yearCode=e3tuemVufX17ezIwfX17e29yYWlsMjV9fXt7b3JhaWwyNX19&AppVer=1.0.0
+// http://localhost:7500/V1/?token=YA3N0MD76S657DCR&SV=0&version=R50B3&SV=0&SpVer=V1&yearCode=e3tuemVufX17ezIwfX17e2RlbW9zdG9yZX19e3tkZW1vc3RvcmV9fQ==&AppVer=1.0.0 demostore
 // https://nxt01.optigoapps.com/V1/?token=IGQ6NSF7QW6QA78N&SV=1&SV=1&SpVer=V1&yearCode=e3tsaXZlNi5vcHRpZ29hcHBzLmNvbX19e3syMH19e3t0ZXN0NzdhfX17e3Rlc3Q3N2F9fQ==&AppVer=1.0.0
+
 'use client';
 
 import BottomNav from '@/components/BottomNav';
@@ -381,8 +383,8 @@ export default function HomePage() {
 
 // find . -mindepth 1 -delete
 
-// supersalesrep.web - V1 - 6008 - 43
-// npm run build && pm2 restart 43 && pm2 save 
+// supersalesrep.web - V1 - 6008 - 38
+// npm run build && pm2 restart 38 && pm2 save 
 
 
 // nxt01.optigoaps.com -  V1 - 7500 

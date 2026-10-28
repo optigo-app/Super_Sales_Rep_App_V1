@@ -1,4 +1,39 @@
 import { masterApi } from './masterApi';
+import { getDesignArticlesApi } from './articleCollectionApi';
+
+// "All articles" direct-adds carry no picks — fetch every articlemastercode
+// via getarticle so the save payload sends real codes like explicit picks
+export const resolveArticleSelections = async (items) => {
+    const needsFetch = (item) =>
+        item.source === 'article' && item.allArticlesSelected && !(item.selectedArticles?.length);
+    if (!items.some(needsFetch)) return items;
+
+    const cache = new Map();
+    const fetchArticles = (designno) => {
+        if (!cache.has(designno)) {
+            cache.set(
+                designno,
+                getDesignArticlesApi(designno).then((res) => res?.rd || []).catch(() => [])
+            );
+        }
+        return cache.get(designno);
+    };
+
+    return Promise.all(
+        items.map(async (item) => {
+            if (!needsFetch(item)) return item;
+            const rows = await fetchArticles(item.designno);
+            const selectedArticles = rows.map((row, i) => ({
+                id: `art:${row.autocode ?? item.designno}:${row.ArticleNo ?? i}`,
+                articleno: row.ArticleNo,
+                articlemastercode: row.ArticleMasterCode ?? row.articlemastercode ?? row.ArticleNo,
+            }));
+            return selectedArticles.length
+                ? { ...item, selectedArticles, allArticlesSelected: false }
+                : item;
+        })
+    );
+};
 
 export const SaveCartApi = async (cartItems) => {
     try {

@@ -12,7 +12,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { Menu as MenuIcon, User, Zap, Sparkles } from 'lucide-react';
+import { Menu as MenuIcon, User, Zap, Sparkles, Images, Send } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function Header({ rightContent }) {
@@ -39,6 +39,8 @@ export default function Header({ rightContent }) {
     { label: 'Profile', icon: <User size={20} color="#7C3AED" />, path: '/profile' },
     { label: 'Quick Task', icon: <Zap size={20} color="#7C3AED" />, path: '/QuickTask' },
     { label: 'Magic Catalog', icon: <Sparkles size={20} color="#7C3AED" />, path: '/magicCatalog' },
+    { label: 'Albums', icon: <Images size={20} color="#7C3AED" />, path: '/magicCatalog/albums' },
+    { label: 'Send Albums', icon: <Send size={20} color="#7C3AED" />, path: '/magicCatalog/albums/sent' },
   ];
 
   const handleNavigate = (path) => {

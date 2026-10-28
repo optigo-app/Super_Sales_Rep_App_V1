@@ -1,8 +1,12 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2, ArrowLeft, ArrowRightCircle, ShoppingCart, Gem, Package, Newspaper, Pencil } from 'lucide-react';
+import { Trash2, ArrowLeft, ShoppingCart, Gem, Package, Newspaper, Pencil, Images, ListMusic } from 'lucide-react';
 import { motion } from 'framer-motion';
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import {
     Container,
@@ -15,11 +19,17 @@ import {
     CardMedia,
     CardContent,
     Chip,
+    Dialog,
+    DialogContent,
+    TextField,
+    CircularProgress,
 } from '@mui/material';
 
 import { useCart } from '@mc/context/CartContext';
 import { useToast } from '@mc/context/ToastContext';
 import { assetPath } from '@mc/utils/paths';
+import { SaveCartApi, resolveArticleSelections } from '@mc/app/api/SaveCartApi';
+import { callAlbumApi } from '@mc/app/api/albumApi';
 import GridBackground from '../Common/GridBackground';
 import ReusableConfirmModal from '../Common/modals/ReusableConfirmModal';
 import ProductModal from '../Product/ProductModal';
@@ -43,7 +53,7 @@ const SOURCE_META = {
 const CartPageMUI = () => {
     const router = useRouter();
     const { items: cartItems, removeFromCart, addToCart, updateCartItem, clearCart, totalCount, hasHydrated, loading } = useCart();
-    const { showSuccess, showInfo } = useToast();
+    const { showSuccess, showInfo, showError } = useToast();
     const [openConfirmModal, setOpenConfirmModal] = useState(false);
     const [confirmModalType, setConfirmModalType] = useState(null);
     const [itemToRemove, setItemToRemove] = useState(null);
@@ -95,8 +105,130 @@ const CartPageMUI = () => {
         setOpenProductModal(true);
     };
 
-    const handleContinue = () => {
-        router.push('/magicCatalog/checkout');
+    // --- Create / Update Album flow ---
+    // Album_UniqueName / ProAlbum_Save / ProAlbum_Edit go through the shared
+    // CommonAPI via callAlbumApi (app/api/albumApi.js)
+    const [albumDialogOpen, setAlbumDialogOpen] = useState(false);
+    const [dialogMode, setDialogMode] = useState('create'); // 'create' | 'update'
+    const [albumName, setAlbumName] = useState('');
+    const [albumDate, setAlbumDate] = useState(dayjs());
+    const [queryStringId, setQueryStringId] = useState(null);
+    const [albumBusy, setAlbumBusy] = useState(null); // 'create' | 'save' | 'savego'
+    const [uniqueNameLoading, setUniqueNameLoading] = useState(false);
+    const [albumEditId, setAlbumEditId] = useState(null);
+
+    // sessionStorage.albumId is set by the product page's ?albumid loader —
+    // its presence means the cart holds album items being edited
+    useEffect(() => {
+        if (!hasHydrated) return;
+        setAlbumEditId(sessionStorage.getItem('albumId'));
+    }, [hasHydrated]);
+
+    // Step 1 — SaveQueryStringdesignid, then open the album dialog
+    // and prefill the name from Album_UniqueName
+    const handleCreateAlbum = async () => {
+        if (!cartItems.length || albumBusy) return;
+        setAlbumBusy('create');
+        try {
+            const resolvedItems = await resolveArticleSelections(cartItems);
+            const res = await SaveCartApi(resolvedItems);
+            const row = res?.data?.rd?.[0] || {};
+            const qid = row.QID ?? row.QueryStringid ?? row.id ?? row.ID;
+            if (!qid) throw new Error('Could not get the album reference id');
+            setQueryStringId(qid);
+            setAlbumDate(dayjs());
+            setAlbumName('');
+            setDialogMode('create');
+            setAlbumDialogOpen(true);
+
+            setUniqueNameLoading(true);
+            const uniq = await callAlbumApi('Album_UniqueName', '{}', 'Album_UniqueName');
+            const uniqRow = uniq?.rd?.[0] || {};
+            const suggested =
+                uniqRow.AlbumName ?? uniqRow.UniqueName ?? uniqRow.uniquename ?? uniqRow.Name ??
+                Object.values(uniqRow).find(v => typeof v === 'string' && v.trim()) ?? '';
+            setAlbumName(suggested);
+        } catch (err) {
+            console.error('CreateAlbum Error:', err);
+            showError(err?.message || 'Failed to start album creation');
+        } finally {
+            setAlbumBusy(null);
+            setUniqueNameLoading(false);
+        }
+    };
+
+    // Update flow — the album's items were loaded into the cart by the
+    // product page; re-save them under a fresh QueryStringid, then
+    // ProAlbum_Edit attaches it to the existing album
+    const handleUpdateAlbum = async () => {
+        if (!cartItems.length || albumBusy) return;
+        setAlbumBusy('create');
+        try {
+            const resolvedItems = await resolveArticleSelections(cartItems);
+            const res = await SaveCartApi(resolvedItems);
+            const row = res?.data?.rd?.[0] || {};
+            const qid = row.QID ?? row.QueryStringid ?? row.id ?? row.ID;
+            if (!qid) throw new Error('Could not get the album reference id');
+            setQueryStringId(qid);
+            setAlbumName(sessionStorage.getItem('albumName') || '');
+            setAlbumDate(dayjs());
+            setDialogMode('update');
+            setAlbumDialogOpen(true);
+        } catch (err) {
+            console.error('UpdateAlbum Error:', err);
+            showError(err?.message || 'Failed to start album update');
+        } finally {
+            setAlbumBusy(null);
+        }
+    };
+
+    // Step 2 — ProAlbum_Save (create) or ProAlbum_Edit (update)
+    const handleAlbumSave = async (goToList = false) => {
+        if (!albumName.trim()) {
+            showError('Please enter an album name');
+            return;
+        }
+        const isUpdate = dialogMode === 'update';
+        setAlbumBusy(goToList ? 'savego' : 'save');
+        try {
+            const p = isUpdate
+                ? JSON.stringify({
+                    Article_AlbumManagement_AlbumMasterid: Number(albumEditId) || albumEditId,
+                    AlbumName: albumName.trim(),
+                    QueryStringid: Number(queryStringId) || queryStringId,
+                })
+                : JSON.stringify({
+                    AlbumName: albumName.trim(),
+                    Albumdate: albumDate ? dayjs(albumDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+                    QueryStringid: Number(queryStringId) || queryStringId,
+                });
+            const res = await callAlbumApi(
+                isUpdate ? 'ProAlbum_Edit' : 'ProAlbum_Save',
+                p,
+                isUpdate ? 'ProAlbum_Edit' : 'ProAlbum_Save'
+            );
+            const row = res?.rd?.[0] || {};
+            const msg = row.MSG ?? row.Msg ?? row.message;
+            if (msg && String(msg).toLowerCase() !== 'success') {
+                throw new Error(String(msg));
+            }
+            showSuccess(isUpdate ? 'Album updated' : 'Album saved successfully');
+            setAlbumDialogOpen(false);
+            clearCart();
+            sessionStorage.removeItem('albumId');
+            sessionStorage.removeItem('albumName');
+            router.push(goToList ? '/magicCatalog/albums' : '/magicCatalog');
+        } catch (err) {
+            console.error(`${isUpdate ? 'ProAlbum_Edit' : 'ProAlbum_Save'} Error:`, err);
+            showError(err?.message || 'Failed to save album');
+        } finally {
+            setAlbumBusy(null);
+        }
+    };
+
+    const handleCloseAlbumDialog = () => {
+        if (albumBusy === 'save' || albumBusy === 'savego') return;
+        setAlbumDialogOpen(false);
     };
 
     const handleArticleEditConfirm = (selectedIds, product) => {
@@ -151,6 +283,20 @@ const CartPageMUI = () => {
                                 <Typography variant="body2" sx={{ whiteSpace: 'nowrap', color: 'inherit', opacity: 0.9, display: { xs: 'none', sm: 'block' } }}>
                                     {totalCount} products
                                 </Typography>
+                            )}
+                            {albumEditId && (
+                                <Chip
+                                    label="Editing album"
+                                    size="small"
+                                    sx={{
+                                        height: 22,
+                                        fontSize: '0.65rem',
+                                        fontWeight: 700,
+                                        bgcolor: 'rgba(115,103,240,0.12)',
+                                        color: 'primary.main',
+                                        border: '1px solid rgba(115,103,240,0.3)',
+                                    }}
+                                />
                             )}
                         </>
                     }
@@ -502,7 +648,7 @@ const CartPageMUI = () => {
 
             </Container>
 
-            {/* Bottom action bar — Continue checkout (same pill style as product page) */}
+            {/* Bottom action bar — Create Album (same pill style as product page) */}
             {cartItems.length > 0 && (
                 <Box sx={{
                     position: "fixed",
@@ -530,8 +676,9 @@ const CartPageMUI = () => {
                     }}>
                         <Button
                             variant="contained"
-                            onClick={handleContinue}
-                            endIcon={<ArrowRightCircle size={18} />}
+                            onClick={albumEditId ? handleUpdateAlbum : handleCreateAlbum}
+                            disabled={albumBusy === 'create'}
+                            startIcon={albumBusy === 'create' ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : <Images size={18} />}
                             sx={{
                                 textTransform: 'none',
                                 fontWeight: 600,
@@ -549,7 +696,7 @@ const CartPageMUI = () => {
                                 },
                             }}
                         >
-                            Continue ({totalCount})
+                            {albumBusy === 'create' ? 'Preparing...' : `${albumEditId ? 'Update' : 'Create'} Album (${totalCount})`}
                         </Button>
                     </Box>
                 </Box>
@@ -588,6 +735,127 @@ const CartPageMUI = () => {
                     setOpenProductModal(true);
                 }}
             />
+
+            {/* Create Album dialog — name (unique-name prefilled) + date + actions */}
+            <Dialog
+                open={albumDialogOpen}
+                onClose={handleCloseAlbumDialog}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 3, m: 2 } }}
+            >
+                <Box sx={{ px: 2.5, pt: 2.5, pb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.5 }}>
+                        <Box
+                            sx={{
+                                width: 38,
+                                height: 38,
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, #7367f0 0%, #5f5bd6 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#fff',
+                                flexShrink: 0,
+                            }}
+                        >
+                            <Images size={18} />
+                        </Box>
+                        <Box>
+                            <Typography variant="h6" fontWeight={700} sx={{ fontSize: '1.05rem', lineHeight: 1.2 }}>
+                                {dialogMode === 'update' ? 'Update Album' : 'Create Album'}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                Save {cartItems.length} item{cartItems.length === 1 ? '' : 's'} {dialogMode === 'update' ? 'to this album' : 'to a new album'}
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Box>
+                <DialogContent sx={{ px: 2.5, pt: 1.5, pb: 0 }}>
+                    <TextField
+                        fullWidth
+                        label="Album Name"
+                        value={albumName}
+                        onChange={(e) => setAlbumName(e.target.value)}
+                        placeholder="Enter album name"
+                        size="small"
+                        sx={{ mb: 2 }}
+                        InputProps={{
+                            endAdornment: uniqueNameLoading ? <CircularProgress size={16} /> : null,
+                        }}
+                        InputLabelProps={{ shrink: true }}
+                    />
+                    {/* Date is only part of the create payload (ProAlbum_Edit takes no date) */}
+                    {dialogMode === 'create' && (
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="Album Date"
+                                value={albumDate}
+                                onChange={(newValue) => setAlbumDate(newValue)}
+                                format="DD/MM/YYYY"
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        size: 'small',
+                                        InputLabelProps: { shrink: true },
+                                    },
+                                }}
+                            />
+                        </LocalizationProvider>
+                    )}
+                </DialogContent>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1, px: 2.5, pt: 2.5, pb: 2.5 }}>
+                    <Button
+                        variant="outlined"
+                        onClick={handleCloseAlbumDialog}
+                        disabled={albumBusy === 'save' || albumBusy === 'savego'}
+                        sx={{
+                            textTransform: 'none',
+                            borderRadius: 2,
+                            fontWeight: 600,
+                            order: { xs: 2, sm: 1 },
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => handleAlbumSave(false)}
+                        disabled={Boolean(albumBusy) || uniqueNameLoading}
+                        startIcon={albumBusy === 'save' ? <CircularProgress size={15} sx={{ color: '#fff' }} /> : null}
+                        sx={{
+                            flex: 1,
+                            textTransform: 'none',
+                            borderRadius: 2,
+                            fontWeight: 600,
+                            order: { xs: 0, sm: 2 },
+                            background: 'linear-gradient(135deg, #7367f0 0%, #5f5bd6 100%)',
+                            boxShadow: 'none',
+                            '&:hover': { background: 'linear-gradient(135deg, #5f5bd6 0%, #514ec9 100%)', boxShadow: 'none' },
+                        }}
+                    >
+                        {albumBusy === 'save' ? 'Saving...' : 'Save'}
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => handleAlbumSave(true)}
+                        disabled={Boolean(albumBusy) || uniqueNameLoading}
+                        startIcon={albumBusy === 'savego' ? <CircularProgress size={15} sx={{ color: '#fff' }} /> : <ListMusic size={16} />}
+                        sx={{
+                            flex: 1,
+                            textTransform: 'none',
+                            borderRadius: 2,
+                            fontWeight: 600,
+                            order: { xs: 1, sm: 3 },
+                            boxShadow: 'none',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        {albumBusy === 'savego' ? 'Saving...' : 'Save & Go to List'}
+                    </Button>
+                </Box>
+            </Dialog>
         </GridBackground>
     );
 };
